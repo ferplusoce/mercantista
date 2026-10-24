@@ -10,7 +10,7 @@ export const CATEGORIES: { id: Category; name: string; desc: string; emoji: stri
   { id: "citricos", name: "Cítricos y plátanos", desc: "Cajones, racimos y mallas", emoji: "🍋" },
 ];
 
-export const FORMATS = ["Saco", "Medio saco", "Jaba", "Malla", "Atado", "Ciento"] as const;
+export const FORMATS = ["Saco", "Medio saco", "Jaba", "Caja", "Malla", "Atado", "Ciento"] as const;
 
 export type Vendor = {
   id: string; name: string; stall: string; pavilion: string; contact: string; phone: string;
@@ -46,7 +46,7 @@ export const PRODUCTS: Product[] = [
   p("cebolla-blanca", "Cebolla blanca", "cebollas", "santa-rosa", "Malla", "Malla de 20 kg", 20, 38, "🧅", "Comercial"),
   p("tomate-katia", "Tomate Katia de primera", "hortalizas", "el-huerto", "Jaba", "Jaba de 20 kg", 20, 48, "🍅"),
   p("zanahoria", "Zanahoria", "hortalizas", "el-huerto", "Saco", "Saco de 40 kg", 40, 45, "🥕", "Comercial"),
-  p("pimiento", "Pimiento rojo", "hortalizas", "el-huerto", "Caja" as Product["format"], "Caja de 10 kg", 10, 32, "🫑"),
+  p("pimiento", "Pimiento rojo", "hortalizas", "el-huerto", "Caja", "Caja de 10 kg", 10, 32, "🫑"),
   p("lechuga", "Lechuga americana", "hojas", "el-huerto", "Atado", "Cajón de 24 unid. (~12 kg)", 12, 36, "🥬"),
   p("culantro", "Culantro", "hojas", "el-huerto", "Atado", "Atado mayorista (~5 kg)", 5, 18, "🌿"),
   p("limon-sutil", "Limón Sutil", "citricos", "dona-elena", "Jaba", "Cajón de 18 kg", 18, 72, "🍋", "Primera", "por_confirmar"),
