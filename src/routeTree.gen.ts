@@ -12,6 +12,9 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as CarritoRouteImport } from './routes/carrito'
 import { Route as CatalogoRouteImport } from './routes/catalogo'
+import { Route as CheckoutRouteImport } from './routes/checkout'
+import { Route as CuentaRouteImport } from './routes/cuenta'
+import { Route as SeguimientoRouteImport } from './routes/seguimiento'
 import { Route as ServiciosRouteImport } from './routes/servicios'
 import { Route as SolicitudRouteImport } from './routes/solicitud'
 import { Route as PuestosIndexRouteImport } from './routes/puestos.index'
@@ -30,6 +33,21 @@ const CarritoRoute = CarritoRouteImport.update({
 const CatalogoRoute = CatalogoRouteImport.update({
   id: '/catalogo',
   path: '/catalogo',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CheckoutRoute = CheckoutRouteImport.update({
+  id: '/checkout',
+  path: '/checkout',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CuentaRoute = CuentaRouteImport.update({
+  id: '/cuenta',
+  path: '/cuenta',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SeguimientoRoute = SeguimientoRouteImport.update({
+  id: '/seguimiento',
+  path: '/seguimiento',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ServiciosRoute = ServiciosRouteImport.update({
@@ -57,6 +75,9 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/carrito': typeof CarritoRoute
   '/catalogo': typeof CatalogoRoute
+  '/checkout': typeof CheckoutRoute
+  '/cuenta': typeof CuentaRoute
+  '/seguimiento': typeof SeguimientoRoute
   '/servicios': typeof ServiciosRoute
   '/solicitud': typeof SolicitudRoute
   '/puestos/$id': typeof PuestosIdRoute
@@ -66,6 +87,9 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/carrito': typeof CarritoRoute
   '/catalogo': typeof CatalogoRoute
+  '/checkout': typeof CheckoutRoute
+  '/cuenta': typeof CuentaRoute
+  '/seguimiento': typeof SeguimientoRoute
   '/servicios': typeof ServiciosRoute
   '/solicitud': typeof SolicitudRoute
   '/puestos/$id': typeof PuestosIdRoute
@@ -76,6 +100,9 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/carrito': typeof CarritoRoute
   '/catalogo': typeof CatalogoRoute
+  '/checkout': typeof CheckoutRoute
+  '/cuenta': typeof CuentaRoute
+  '/seguimiento': typeof SeguimientoRoute
   '/servicios': typeof ServiciosRoute
   '/solicitud': typeof SolicitudRoute
   '/puestos/$id': typeof PuestosIdRoute
@@ -87,6 +114,9 @@ export interface FileRouteTypes {
     | '/'
     | '/carrito'
     | '/catalogo'
+    | '/checkout'
+    | '/cuenta'
+    | '/seguimiento'
     | '/servicios'
     | '/solicitud'
     | '/puestos/$id'
@@ -96,6 +126,9 @@ export interface FileRouteTypes {
     | '/'
     | '/carrito'
     | '/catalogo'
+    | '/checkout'
+    | '/cuenta'
+    | '/seguimiento'
     | '/servicios'
     | '/solicitud'
     | '/puestos/$id'
@@ -105,6 +138,9 @@ export interface FileRouteTypes {
     | '/'
     | '/carrito'
     | '/catalogo'
+    | '/checkout'
+    | '/cuenta'
+    | '/seguimiento'
     | '/servicios'
     | '/solicitud'
     | '/puestos/$id'
@@ -115,6 +151,9 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   CarritoRoute: typeof CarritoRoute
   CatalogoRoute: typeof CatalogoRoute
+  CheckoutRoute: typeof CheckoutRoute
+  CuentaRoute: typeof CuentaRoute
+  SeguimientoRoute: typeof SeguimientoRoute
   ServiciosRoute: typeof ServiciosRoute
   SolicitudRoute: typeof SolicitudRoute
   PuestosIdRoute: typeof PuestosIdRoute
@@ -142,6 +181,27 @@ declare module '@tanstack/react-router' {
       path: '/catalogo'
       fullPath: '/catalogo'
       preLoaderRoute: typeof CatalogoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/checkout': {
+      id: '/checkout'
+      path: '/checkout'
+      fullPath: '/checkout'
+      preLoaderRoute: typeof CheckoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cuenta': {
+      id: '/cuenta'
+      path: '/cuenta'
+      fullPath: '/cuenta'
+      preLoaderRoute: typeof CuentaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/seguimiento': {
+      id: '/seguimiento'
+      path: '/seguimiento'
+      fullPath: '/seguimiento'
+      preLoaderRoute: typeof SeguimientoRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/servicios': {
@@ -179,6 +239,9 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   CarritoRoute: CarritoRoute,
   CatalogoRoute: CatalogoRoute,
+  CheckoutRoute: CheckoutRoute,
+  CuentaRoute: CuentaRoute,
+  SeguimientoRoute: SeguimientoRoute,
   ServiciosRoute: ServiciosRoute,
   SolicitudRoute: SolicitudRoute,
   PuestosIdRoute: PuestosIdRoute,
