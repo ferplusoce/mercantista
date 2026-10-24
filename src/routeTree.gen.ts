@@ -10,7 +10,10 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as CarritoRouteImport } from './routes/carrito'
 import { Route as CatalogoRouteImport } from './routes/catalogo'
+import { Route as ServiciosRouteImport } from './routes/servicios'
+import { Route as SolicitudRouteImport } from './routes/solicitud'
 import { Route as PuestosIndexRouteImport } from './routes/puestos.index'
 import { Route as PuestosIdRouteImport } from './routes/puestos.$id'
 
@@ -19,9 +22,24 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CarritoRoute = CarritoRouteImport.update({
+  id: '/carrito',
+  path: '/carrito',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CatalogoRoute = CatalogoRouteImport.update({
   id: '/catalogo',
   path: '/catalogo',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ServiciosRoute = ServiciosRouteImport.update({
+  id: '/servicios',
+  path: '/servicios',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SolicitudRoute = SolicitudRouteImport.update({
+  id: '/solicitud',
+  path: '/solicitud',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PuestosIndexRoute = PuestosIndexRouteImport.update({
@@ -37,34 +55,68 @@ const PuestosIdRoute = PuestosIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/carrito': typeof CarritoRoute
   '/catalogo': typeof CatalogoRoute
+  '/servicios': typeof ServiciosRoute
+  '/solicitud': typeof SolicitudRoute
   '/puestos/$id': typeof PuestosIdRoute
   '/puestos/': typeof PuestosIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/carrito': typeof CarritoRoute
   '/catalogo': typeof CatalogoRoute
+  '/servicios': typeof ServiciosRoute
+  '/solicitud': typeof SolicitudRoute
   '/puestos/$id': typeof PuestosIdRoute
   '/puestos': typeof PuestosIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/carrito': typeof CarritoRoute
   '/catalogo': typeof CatalogoRoute
+  '/servicios': typeof ServiciosRoute
+  '/solicitud': typeof SolicitudRoute
   '/puestos/$id': typeof PuestosIdRoute
   '/puestos/': typeof PuestosIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/catalogo' | '/puestos/$id' | '/puestos/'
+  fullPaths:
+    | '/'
+    | '/carrito'
+    | '/catalogo'
+    | '/servicios'
+    | '/solicitud'
+    | '/puestos/$id'
+    | '/puestos/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/catalogo' | '/puestos/$id' | '/puestos'
-  id: '__root__' | '/' | '/catalogo' | '/puestos/$id' | '/puestos/'
+  to:
+    | '/'
+    | '/carrito'
+    | '/catalogo'
+    | '/servicios'
+    | '/solicitud'
+    | '/puestos/$id'
+    | '/puestos'
+  id:
+    | '__root__'
+    | '/'
+    | '/carrito'
+    | '/catalogo'
+    | '/servicios'
+    | '/solicitud'
+    | '/puestos/$id'
+    | '/puestos/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  CarritoRoute: typeof CarritoRoute
   CatalogoRoute: typeof CatalogoRoute
+  ServiciosRoute: typeof ServiciosRoute
+  SolicitudRoute: typeof SolicitudRoute
   PuestosIdRoute: typeof PuestosIdRoute
   PuestosIndexRoute: typeof PuestosIndexRoute
 }
@@ -78,11 +130,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/carrito': {
+      id: '/carrito'
+      path: '/carrito'
+      fullPath: '/carrito'
+      preLoaderRoute: typeof CarritoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/catalogo': {
       id: '/catalogo'
       path: '/catalogo'
       fullPath: '/catalogo'
       preLoaderRoute: typeof CatalogoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/servicios': {
+      id: '/servicios'
+      path: '/servicios'
+      fullPath: '/servicios'
+      preLoaderRoute: typeof ServiciosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/solicitud': {
+      id: '/solicitud'
+      path: '/solicitud'
+      fullPath: '/solicitud'
+      preLoaderRoute: typeof SolicitudRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/puestos/': {
@@ -104,7 +177,10 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  CarritoRoute: CarritoRoute,
   CatalogoRoute: CatalogoRoute,
+  ServiciosRoute: ServiciosRoute,
+  SolicitudRoute: SolicitudRoute,
   PuestosIdRoute: PuestosIdRoute,
   PuestosIndexRoute: PuestosIndexRoute,
 }
