@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { useStore } from "@/lib/store";
-import { VendorCard } from "./index";
+import { VendorCard } from "@/components/VendorCard";
 
 export const Route = createFileRoute("/puestos/")({
   head: () => ({ meta: [
