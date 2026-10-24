@@ -41,14 +41,14 @@ function Cuenta() {
           <select className={inputCls} value={addr.zone} onChange={(e) => setAddr({ ...addr, zone: e.target.value })}>{ZONES.map((z) => <option key={z}>{z}</option>)}</select>
           <input className={inputCls} placeholder="Dirección" value={addr.line} onChange={(e) => setAddr({ ...addr, line: e.target.value })} />
           <input className={inputCls} placeholder="Referencia (portón, color, esquina)" value={addr.ref} onChange={(e) => setAddr({ ...addr, ref: e.target.value })} />
-          <button className="h-11 w-full rounded-xl border font-semibold" onClick={() => { if (!addr.line) return toast.error("Ingresa la dirección"); setState((s) => ({ profile: { ...s.profile, addresses: [...s.profile.addresses, addr] } })); setAddr({ ...addr, line: "", ref: "" }); }}>Guardar dirección</button>
+          <button className="h-11 w-full rounded-xl border font-semibold" onClick={() => { if (!addr.line) { toast.error("Ingresa la dirección"); return; } setState((s) => ({ profile: { ...s.profile, addresses: [...s.profile.addresses, addr] } })); setAddr({ ...addr, line: "", ref: "" }); }}>Guardar dirección</button>
         </Card>
         <Card className="space-y-3">
           <h2 className="font-bold">Mis taxis de confianza</h2>
           {p.taxis.map((t, i) => <div key={i} className="flex justify-between rounded-xl bg-muted p-3 text-sm"><span>🚕 {t.driver} · {t.plate} · {t.phone}</span><button aria-label="Eliminar" onClick={() => setState((s) => ({ profile: { ...s.profile, taxis: s.profile.taxis.filter((_, j) => j !== i) } }))}><Trash2 className="h-4 w-4" /></button></div>)}
           <input className={inputCls} placeholder="Nombre del chofer" value={taxi.driver} onChange={(e) => setTaxi({ ...taxi, driver: e.target.value })} />
           <div className="grid grid-cols-2 gap-2"><input className={inputCls} placeholder="Placa" value={taxi.plate} onChange={(e) => setTaxi({ ...taxi, plate: e.target.value.toUpperCase() })} /><input className={inputCls} placeholder="Celular" value={taxi.phone} onChange={(e) => setTaxi({ ...taxi, phone: e.target.value })} /></div>
-          <button className="h-11 w-full rounded-xl border font-semibold" onClick={() => { if (!taxi.driver || !taxi.plate) return toast.error("Completa chofer y placa"); setState((s) => ({ profile: { ...s.profile, taxis: [...s.profile.taxis, taxi] } })); setTaxi({ driver: "", plate: "", phone: "" }); }}>Guardar taxi</button>
+          <button className="h-11 w-full rounded-xl border font-semibold" onClick={() => { if (!taxi.driver || !taxi.plate) { toast.error("Completa chofer y placa"); return; } setState((s) => ({ profile: { ...s.profile, taxis: [...s.profile.taxis, taxi] } })); setTaxi({ driver: "", plate: "", phone: "" }); }}>Guardar taxi</button>
         </Card>
       </div>
       <Card>

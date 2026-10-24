@@ -39,7 +39,7 @@ function Index() {
           <p className="mt-4 text-background/85 md:text-lg">Compramos tus frutas y verduras en los mejores puestos de Unicachi y te las entregamos en tu taxi de confianza o con nuestra miniván.</p>
           <div className="mt-6 flex flex-col gap-3 sm:flex-row">
             <Link to="/catalogo" className="inline-flex h-12 items-center justify-center rounded-xl bg-primary px-6 font-semibold text-primary-foreground"><ShoppingBag className="mr-2 h-5 w-5" />Explorar catálogo</Link>
-            <Link to="/solicitud" search={{}} className="inline-flex h-12 items-center justify-center rounded-xl bg-background px-6 font-semibold text-foreground"><ClipboardList className="mr-2 h-5 w-5" />Pedir lista por encargo</Link>
+            <Link to="/solicitud" search={{ vendor: undefined }} className="inline-flex h-12 items-center justify-center rounded-xl bg-background px-6 font-semibold text-foreground"><ClipboardList className="mr-2 h-5 w-5" />Pedir lista por encargo</Link>
           </div>
         </div>
       </section>
@@ -88,7 +88,7 @@ function Index() {
 
       <section className="flex flex-col items-start justify-between gap-4 rounded-3xl bg-primary p-8 text-primary-foreground md:flex-row md:items-center">
         <div><h2 className="text-2xl font-bold">¿Tienes tu lista lista?</h2><p className="opacity-90">Sube tu lista de compras o escríbela aquí y nosotros cotizamos en Unicachi por ti.</p></div>
-        <Link to="/solicitud" search={{}} className="inline-flex h-12 items-center rounded-xl bg-background px-6 font-semibold text-foreground">Cotizar mi lista</Link>
+        <Link to="/solicitud" search={{ vendor: undefined }} className="inline-flex h-12 items-center rounded-xl bg-background px-6 font-semibold text-foreground">Cotizar mi lista</Link>
       </section>
     </div>
   );

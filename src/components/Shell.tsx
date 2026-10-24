@@ -50,7 +50,7 @@ export function Header() {
       <div className="mx-auto flex max-w-7xl items-center gap-4 px-4 py-3">
         <Logo />
         <div className="hidden flex-1 md:block"><SearchBox /></div>
-        <Link to="/solicitud" search={{}} className="hidden rounded-xl border bg-card px-3 py-2 text-sm font-medium hover:bg-muted lg:inline-flex"><ClipboardList className="mr-1.5 h-4 w-4" />Solicitud personalizada</Link>
+        <Link to="/solicitud" search={{ vendor: undefined }} className="hidden rounded-xl border bg-card px-3 py-2 text-sm font-medium hover:bg-muted lg:inline-flex"><ClipboardList className="mr-1.5 h-4 w-4" />Solicitud personalizada</Link>
         <Link to="/cuenta" className="ml-auto hidden rounded-xl p-2 hover:bg-muted md:block md:ml-0" aria-label="Mi cuenta"><User className="h-5 w-5" /></Link>
         <Link to="/carrito" className="relative ml-auto rounded-xl bg-primary p-2.5 text-primary-foreground md:ml-0" aria-label="Carrito">
           <ShoppingBag className="h-5 w-5" />
