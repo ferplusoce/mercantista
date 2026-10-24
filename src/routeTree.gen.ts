@@ -10,33 +10,167 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AdminRouteImport } from './routes/admin'
+import { Route as CarritoRouteImport } from './routes/carrito'
+import { Route as CatalogoRouteImport } from './routes/catalogo'
+import { Route as CheckoutRouteImport } from './routes/checkout'
+import { Route as CuentaRouteImport } from './routes/cuenta'
+import { Route as SeguimientoRouteImport } from './routes/seguimiento'
+import { Route as ServiciosRouteImport } from './routes/servicios'
+import { Route as SolicitudRouteImport } from './routes/solicitud'
+import { Route as PuestosIndexRouteImport } from './routes/puestos.index'
+import { Route as PuestosIdRouteImport } from './routes/puestos.$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CarritoRoute = CarritoRouteImport.update({
+  id: '/carrito',
+  path: '/carrito',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CatalogoRoute = CatalogoRouteImport.update({
+  id: '/catalogo',
+  path: '/catalogo',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CheckoutRoute = CheckoutRouteImport.update({
+  id: '/checkout',
+  path: '/checkout',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CuentaRoute = CuentaRouteImport.update({
+  id: '/cuenta',
+  path: '/cuenta',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SeguimientoRoute = SeguimientoRouteImport.update({
+  id: '/seguimiento',
+  path: '/seguimiento',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ServiciosRoute = ServiciosRouteImport.update({
+  id: '/servicios',
+  path: '/servicios',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SolicitudRoute = SolicitudRouteImport.update({
+  id: '/solicitud',
+  path: '/solicitud',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PuestosIndexRoute = PuestosIndexRouteImport.update({
+  id: '/puestos/',
+  path: '/puestos/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PuestosIdRoute = PuestosIdRouteImport.update({
+  id: '/puestos/$id',
+  path: '/puestos/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
+  '/carrito': typeof CarritoRoute
+  '/catalogo': typeof CatalogoRoute
+  '/checkout': typeof CheckoutRoute
+  '/cuenta': typeof CuentaRoute
+  '/seguimiento': typeof SeguimientoRoute
+  '/servicios': typeof ServiciosRoute
+  '/solicitud': typeof SolicitudRoute
+  '/puestos/$id': typeof PuestosIdRoute
+  '/puestos/': typeof PuestosIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
+  '/carrito': typeof CarritoRoute
+  '/catalogo': typeof CatalogoRoute
+  '/checkout': typeof CheckoutRoute
+  '/cuenta': typeof CuentaRoute
+  '/seguimiento': typeof SeguimientoRoute
+  '/servicios': typeof ServiciosRoute
+  '/solicitud': typeof SolicitudRoute
+  '/puestos/$id': typeof PuestosIdRoute
+  '/puestos': typeof PuestosIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
+  '/carrito': typeof CarritoRoute
+  '/catalogo': typeof CatalogoRoute
+  '/checkout': typeof CheckoutRoute
+  '/cuenta': typeof CuentaRoute
+  '/seguimiento': typeof SeguimientoRoute
+  '/servicios': typeof ServiciosRoute
+  '/solicitud': typeof SolicitudRoute
+  '/puestos/$id': typeof PuestosIdRoute
+  '/puestos/': typeof PuestosIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/admin'
+    | '/carrito'
+    | '/catalogo'
+    | '/checkout'
+    | '/cuenta'
+    | '/seguimiento'
+    | '/servicios'
+    | '/solicitud'
+    | '/puestos/$id'
+    | '/puestos/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/admin'
+    | '/carrito'
+    | '/catalogo'
+    | '/checkout'
+    | '/cuenta'
+    | '/seguimiento'
+    | '/servicios'
+    | '/solicitud'
+    | '/puestos/$id'
+    | '/puestos'
+  id:
+    | '__root__'
+    | '/'
+    | '/admin'
+    | '/carrito'
+    | '/catalogo'
+    | '/checkout'
+    | '/cuenta'
+    | '/seguimiento'
+    | '/servicios'
+    | '/solicitud'
+    | '/puestos/$id'
+    | '/puestos/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdminRoute: typeof AdminRoute
+  CarritoRoute: typeof CarritoRoute
+  CatalogoRoute: typeof CatalogoRoute
+  CheckoutRoute: typeof CheckoutRoute
+  CuentaRoute: typeof CuentaRoute
+  SeguimientoRoute: typeof SeguimientoRoute
+  ServiciosRoute: typeof ServiciosRoute
+  SolicitudRoute: typeof SolicitudRoute
+  PuestosIdRoute: typeof PuestosIdRoute
+  PuestosIndexRoute: typeof PuestosIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +182,91 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/carrito': {
+      id: '/carrito'
+      path: '/carrito'
+      fullPath: '/carrito'
+      preLoaderRoute: typeof CarritoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/catalogo': {
+      id: '/catalogo'
+      path: '/catalogo'
+      fullPath: '/catalogo'
+      preLoaderRoute: typeof CatalogoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/checkout': {
+      id: '/checkout'
+      path: '/checkout'
+      fullPath: '/checkout'
+      preLoaderRoute: typeof CheckoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cuenta': {
+      id: '/cuenta'
+      path: '/cuenta'
+      fullPath: '/cuenta'
+      preLoaderRoute: typeof CuentaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/seguimiento': {
+      id: '/seguimiento'
+      path: '/seguimiento'
+      fullPath: '/seguimiento'
+      preLoaderRoute: typeof SeguimientoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/servicios': {
+      id: '/servicios'
+      path: '/servicios'
+      fullPath: '/servicios'
+      preLoaderRoute: typeof ServiciosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/solicitud': {
+      id: '/solicitud'
+      path: '/solicitud'
+      fullPath: '/solicitud'
+      preLoaderRoute: typeof SolicitudRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/puestos/': {
+      id: '/puestos/'
+      path: '/puestos'
+      fullPath: '/puestos/'
+      preLoaderRoute: typeof PuestosIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/puestos/$id': {
+      id: '/puestos/$id'
+      path: '/puestos/$id'
+      fullPath: '/puestos/$id'
+      preLoaderRoute: typeof PuestosIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdminRoute: AdminRoute,
+  CarritoRoute: CarritoRoute,
+  CatalogoRoute: CatalogoRoute,
+  CheckoutRoute: CheckoutRoute,
+  CuentaRoute: CuentaRoute,
+  SeguimientoRoute: SeguimientoRoute,
+  ServiciosRoute: ServiciosRoute,
+  SolicitudRoute: SolicitudRoute,
+  PuestosIdRoute: PuestosIdRoute,
+  PuestosIndexRoute: PuestosIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
