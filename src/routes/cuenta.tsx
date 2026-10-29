@@ -36,7 +36,7 @@ function Cuenta() {
       </Card>
       <div className="grid gap-5 md:grid-cols-2">
         <Card className="space-y-3">
-          <h2 className="font-bold">Direcciones para la miniván</h2>
+          <h2 className="font-bold">Direcciones de entrega</h2>
           {p.addresses.map((a, i) => <div key={i} className="flex justify-between rounded-xl bg-muted p-3 text-sm"><div><p className="font-semibold">{a.line}</p><p className="text-muted-foreground">{a.zone} · {a.ref}</p></div><button aria-label="Eliminar" onClick={() => setState((s) => ({ profile: { ...s.profile, addresses: s.profile.addresses.filter((_, j) => j !== i) } }))}><Trash2 className="h-4 w-4" /></button></div>)}
           <select className={inputCls} value={addr.zone} onChange={(e) => setAddr({ ...addr, zone: e.target.value })}>{ZONES.map((z) => <option key={z}>{z}</option>)}</select>
           <input className={inputCls} placeholder="Dirección" value={addr.line} onChange={(e) => setAddr({ ...addr, line: e.target.value })} />

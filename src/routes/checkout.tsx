@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Car, CheckCircle2, Download, MessageCircle, Truck } from "lucide-react";
 import { toast } from "sonner";
 import { SLOTS, ZONES, soles, waLink } from "@/lib/data";
-import { minivanFee, taxiFee } from "@/lib/pricing";
+import { vanFee, taxiFee } from "@/lib/pricing";
 import { createOrder } from "@/lib/orders";
 import { cartSummary, clearCart, setState, useStore, type Order } from "@/lib/store";
 import { Card, Field, inputCls, requireFields } from "@/components/Field";
@@ -11,7 +11,7 @@ import { Card, Field, inputCls, requireFields } from "@/components/Field";
 export const Route = createFileRoute("/checkout")({
   head: () => ({ meta: [
     { title: "Cotización y confirmación — Mercantista" },
-    { name: "description", content: "Elige taxi de confianza o miniván, método de pago y confirma tu pedido." },
+    { name: "description", content: "Elige taxi o entrega en tu bodega, método de pago y confirma tu pedido." },
     { property: "og:title", content: "Confirma tu pedido — Mercantista" },
     { property: "og:description", content: "Cotización transparente de tu abastecimiento." },
   ] }),
@@ -37,9 +37,9 @@ function Checkout() {
   if (done) return <Success o={done} />;
   if (!sum.lines.length) return <div className="rounded-2xl border bg-card p-10 text-center"><p className="font-semibold">No hay productos en tu pedido.</p><Link to="/catalogo" className="mt-3 inline-block text-primary">Ir al catálogo →</Link></div>;
 
-  const mv = minivanFee({ zone: f.zone, kg: sum.weightKg, vendors: sum.vendors, early: f.slot === SLOTS[0] }, t);
-  const serviceFee = service === "taxi_delivery" ? taxiFee(sum.packages, t) : mv.service;
-  const shippingFee = service === "taxi_delivery" ? 0 : mv.shipping;
+  const mv = vanFee({ zone: f.zone, kg: sum.weightKg }, t);
+  const serviceFee = service === "taxi_delivery" ? taxiFee(t) : mv.total;
+  const shippingFee = 0;
   const total = sum.subtotal + serviceFee + shippingFee;
 
   const [saving, setSaving] = useState(false);
@@ -48,7 +48,7 @@ function Checkout() {
     const e = requireFields(f, keys);
     if (f.dphone && !/^9\d{8}$/.test(f.dphone)) e.dphone = "Celular de 9 dígitos";
     if (service === "taxi_delivery" && (f.arrival < "04:00" || f.arrival > "09:00")) e.arrival = "Entre 04:00 y 09:00 am";
-    if (service === "minivan_delivery" && !mv.ok) e.service = "El pedido supera 750 kg, no entra en la miniván";
+    if (service === "minivan_delivery" && !mv.ok) e.service = "El pedido supera 750 kg, supera el límite por pedido";
     setErr(e);
     if (Object.keys(e).length) { toast.error("Completa los campos obligatorios"); return; }
     const o: Order = {
@@ -74,7 +74,7 @@ function Checkout() {
       <div className="space-y-5 lg:col-span-2">
         <h1 className="text-3xl font-bold">Elige tu servicio y confirma</h1>
         <div className="grid gap-3 md:grid-cols-2">
-          {([["taxi_delivery", Car, "Compra y Estiba hacia tu Taxi de Confianza", `Desde ${soles(taxiFee(sum.packages, t))}`], ["minivan_delivery", Truck, "Servicio Integral con Miniván Mercantista", mv.ok ? soles(mv.service + mv.shipping) : "No disponible (> 750 kg)"]] as const).map(([id, Icon, title, price]) => (
+          {([["taxi_delivery", Car, "Compra y subida a tu taxi", `${soles(taxiFee(t))} fijo por pedido`], ["minivan_delivery", Truck, "Entrega en tu bodega (van compartida)", mv.ok ? `Tramo ${mv.tramo} · ${soles(mv.total)}` : "No disponible (> 750 kg)"]] as const).map(([id, Icon, title, price]) => (
             <button key={id} onClick={() => setService(id)} className={`rounded-2xl border-2 bg-card p-5 text-left shadow-sm ${service === id ? "border-primary" : "border-transparent"}`}>
               <Icon className="h-7 w-7 text-primary" /><p className="mt-2 font-bold">{title}</p><p className="text-sm text-muted-foreground">{price}</p>
             </button>
@@ -127,8 +127,8 @@ function Checkout() {
         <p className="text-xs text-muted-foreground">{sum.weightKg} kg · {sum.packages} bultos · {sum.vendors} puestos</p>
         <div className="space-y-1 border-t pt-3 text-sm">
           <div className="flex justify-between"><span>Productos en Unicachi</span><span className="tabular-nums">{soles(sum.subtotal)}</span></div>
-          <div className="flex justify-between"><span>{service === "taxi_delivery" ? "Compra y estiba" : "Compra y consolidación"}</span><span className="tabular-nums">{soles(serviceFee)}</span></div>
-          {service === "minivan_delivery" && <div className="flex justify-between"><span>Transporte y entrega</span><span className="tabular-nums">{soles(shippingFee)}</span></div>}
+          <div className="flex justify-between"><span>{service === "taxi_delivery" ? "Compra y subida a tu taxi" : `Entrega en tu bodega · Tramo ${mv.tramo ?? "-"} (${f.zone})`}</span><span className="tabular-nums">{soles(serviceFee)}</span></div>
+          
         </div>
         <div className="flex justify-between border-t pt-3 text-lg font-bold"><span>Total estimado</span><span className="tabular-nums">{soles(total)}</span></div>
         <button onClick={confirm} disabled={saving} className="h-12 w-full rounded-xl bg-primary font-semibold text-primary-foreground disabled:opacity-60">{saving ? "Enviando pedido..." : "Confirmar y enviar pedido"}</button>
@@ -145,7 +145,7 @@ function Success({ o }: { o: Order }) {
       <h1 className="mt-3 text-2xl font-bold">¡Pedido confirmado!</h1>
       <p className="text-muted-foreground">Tu código de seguimiento</p>
       <p className="font-display text-4xl font-extrabold text-primary">{o.code}</p>
-      <p className="mt-2 text-sm">Total estimado <b>{soles(o.total)}</b> · {o.service === "taxi_delivery" ? "Taxi de confianza" : "Miniván Mercantista"}</p>
+      <p className="mt-2 text-sm">Total estimado <b>{soles(o.total)}</b> · {o.service === "taxi_delivery" ? "Taxi de confianza" : "Entrega en tu bodega (van compartida)"}</p>
       <div className="mt-5 grid gap-2">
         <Link to="/seguimiento" search={{ code: o.code }} className="flex h-12 items-center justify-center rounded-xl bg-primary font-semibold text-primary-foreground">Seguir mi pedido</Link>
         <a href={waLink(text)} target="_blank" rel="noreferrer" className="flex h-12 items-center justify-center rounded-xl bg-success font-semibold text-success-foreground"><MessageCircle className="mr-2 h-5 w-5" />Compartir por WhatsApp</a>

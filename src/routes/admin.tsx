@@ -88,7 +88,7 @@ function Resumen() {
         <Card><p className="mb-2 font-semibold">Pedidos por estado</p><ResponsiveContainer width="100%" height={220}><BarChart data={byStatus}><CartesianGrid strokeDasharray="3 3" stroke="var(--border)" /><XAxis dataKey="name" fontSize={11} /><YAxis allowDecimals={false} /><Tooltip /><Bar dataKey="pedidos" fill="var(--primary)" radius={6} /></BarChart></ResponsiveContainer></Card>
         <Card>
           <p className="mb-2 font-semibold">Por servicio</p>
-          {(["taxi_delivery", "minivan_delivery"] as const).map((s) => <div key={s} className="flex justify-between border-b py-2 text-sm"><span>{s === "taxi_delivery" ? "Servicio 1 · Taxi" : "Servicio 2 · Miniván"}</span><b>{orders.filter((o) => o.service === s).length} pedidos</b></div>)}
+          {(["taxi_delivery", "minivan_delivery"] as const).map((s) => <div key={s} className="flex justify-between border-b py-2 text-sm"><span>{s === "taxi_delivery" ? "Servicio 1 · Taxi" : "Servicio 2 · Van compartida"}</span><b>{orders.filter((o) => o.service === s).length} pedidos</b></div>)}
           <p className="mb-2 mt-4 font-semibold">Puestos a visitar hoy</p>
           {visit.map(({ v, items }) => <div key={v.id} className="flex justify-between py-1 text-sm"><span>{v.stall} · {v.name}</span><b>{items.reduce((s, i) => s + i.qty, 0)} bultos</b></div>)}
         </Card>
@@ -112,7 +112,7 @@ function Pedidos() {
     <Card className="space-y-3">
       <div className="grid gap-2 md:grid-cols-3">
         <select className={inputCls} value={st} onChange={(e) => setSt(e.target.value)}><option value="">Todos los estados</option>{[...STATUS_FLOW, "cancelled" as const].map((s) => <option key={s} value={s}>{STATUS_LABEL[s]}</option>)}</select>
-        <select className={inputCls} value={sv} onChange={(e) => setSv(e.target.value)}><option value="">Todo servicio</option><option value="taxi_delivery">Taxi</option><option value="minivan_delivery">Miniván</option></select>
+        <select className={inputCls} value={sv} onChange={(e) => setSv(e.target.value)}><option value="">Todo servicio</option><option value="taxi_delivery">Taxi</option><option value="minivan_delivery">Van compartida</option></select>
         <input type="date" className={inputCls} value={date} onChange={(e) => setDate(e.target.value)} />
       </div>
       <div className="overflow-x-auto">
@@ -121,7 +121,7 @@ function Pedidos() {
           <tbody>{list.map((o) => (
             <tr key={o.code} className="border-t">
               <td className="p-2"><button className="font-semibold text-primary" onClick={() => setOpen(o)}>{o.code}</button></td>
-              <td className="p-2">{o.business}</td><td className="p-2">{o.service === "taxi_delivery" ? "🚕 Taxi" : "🚐 Miniván"}</td><td className="p-2 tabular-nums">{soles(o.total)}</td>
+              <td className="p-2">{o.business}</td><td className="p-2">{o.service === "taxi_delivery" ? "🚕 Taxi" : "🚐 Van compartida"}</td><td className="p-2 tabular-nums">{soles(o.total)}</td>
               <td className="p-2"><select className="h-9 rounded-lg border bg-card px-2" value={o.status} onChange={(e) => { const ns = e.target.value as OrderStatus; m.setStatus(o, ns).then(() => toast.success(`${o.code}: ${STATUS_LABEL[ns]}`), () => toast.error("No se pudo cambiar el estado")); }}>{[...STATUS_FLOW, "cancelled" as const].map((s) => <option key={s} value={s}>{STATUS_LABEL[s]}</option>)}</select></td>
             </tr>
           ))}</tbody>
@@ -146,7 +146,7 @@ function Pedidos() {
             ))}
             <p className="text-xs text-muted-foreground">Ajusta el precio unitario real comprado y sal del campo para guardar; el total se recalcula.</p>
             {live.taxi ? <div className="rounded-xl border p-3 text-sm"><p className="font-semibold">Taxi de confianza</p>{live.taxi.driver} · {live.taxi.plate} · {live.taxi.phone}<br />Llega {live.taxi.arrival} a {live.taxi.meeting}</div>
-              : <div className="rounded-xl border p-3 text-sm"><p className="font-semibold">Hoja de ruta miniván</p>Unicachi → {live.zone} · {live.address}<br />{live.slot} · {live.weightKg} kg / {live.packages} bultos · Contacto {live.phone}</div>}
+              : <div className="rounded-xl border p-3 text-sm"><p className="font-semibold">Hoja de ruta van compartida</p>Unicachi → {live.zone} · {live.address}<br />{live.slot} · {live.weightKg} kg / {live.packages} bultos · Contacto {live.phone}</div>}
             <p className="text-right text-lg font-bold">Total {soles(live.total)}</p>
           </>}
         </DialogContent>
@@ -214,18 +214,14 @@ function Puestos() {
 function Tarifas() {
   const t = useStore((s) => s.tariffs);
   const set = (p: Partial<typeof t>) => setState((s) => ({ tariffs: { ...s.tariffs, ...p } }));
-  const num = (k: "taxiBase" | "taxiPerExtraPackage" | "taxiFreePackages" | "purchaseFee" | "multiVendorFee" | "earlySlotFee", l: string) => (
-    <label className="text-sm"><span className="text-muted-foreground">{l}</span><input type="number" className={inputCls} value={t[k]} onChange={(e) => set({ [k]: +e.target.value })} /></label>
-  );
   return (
     <div className="space-y-4">
       <Card className="grid gap-3 md:grid-cols-3">
-        {num("taxiBase", "Taxi: tarifa base S/")}{num("taxiPerExtraPackage", "Taxi: S/ por bulto adicional")}{num("taxiFreePackages", "Taxi: bultos incluidos")}
-        {num("purchaseFee", "Miniván: gestión de compra S/")}{num("multiVendorFee", "Adicional 3+ puestos S/")}{num("earlySlotFee", "Adicional turno madrugada S/")}
+        <label className="text-sm"><span className="text-muted-foreground">Taxi: precio fijo por pedido S/</span><input type="number" className={inputCls} value={t.taxiFlat} onChange={(e) => set({ taxiFlat: +e.target.value })} /></label>
       </Card>
       <Card className="overflow-x-auto">
-        <table className="w-full text-sm"><thead className="text-left text-muted-foreground"><tr><th className="p-2">Zona</th><th className="p-2">1–200 kg</th><th className="p-2">201–450 kg</th><th className="p-2">451–750 kg</th></tr></thead>
-          <tbody>{ZONES.map((z) => <tr key={z} className="border-t"><td className="p-2">{z}</td>{t.zones[z].map((p, i) => <td key={i} className="p-2"><input type="number" className="h-9 w-24 rounded-lg border bg-card px-2" value={p} onChange={(e) => { const arr = [...t.zones[z]] as [number, number, number]; arr[i] = +e.target.value; set({ zones: { ...t.zones, [z]: arr } }); }} /></td>)}</tr>)}</tbody>
+        <table className="w-full text-sm"><thead className="text-left text-muted-foreground"><tr><th className="p-2">Van compartida</th><th className="p-2">Hasta 200 kg</th><th className="p-2">Hasta 450 kg</th><th className="p-2">Hasta 750 kg</th></tr></thead>
+          <tbody>{([1, 2] as const).map((n) => <tr key={n} className="border-t"><td className="p-2">Tramo {n}<p className="text-xs text-muted-foreground">{ZONES.filter((z) => t.zoneTramo[z] === n).join(", ")}</p></td>{t.tramos[n].map((p, i) => <td key={i} className="p-2"><input type="number" step="0.5" className="h-9 w-24 rounded-lg border bg-card px-2" value={p} onChange={(e) => { const arr = [...t.tramos[n]] as [number, number, number]; arr[i] = +e.target.value; set({ tramos: { ...t.tramos, [n]: arr } }); }} /></td>)}</tr>)}</tbody>
         </table>
       </Card>
     </div>
@@ -241,8 +237,8 @@ function Reportes() {
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
-        <Stat l="Margen promedio diario miniván" v={soles(avg)} />
-        <Stat l="Ingresos miniván (pedidos actuales)" v={soles(income)} />
+        <Stat l="Margen promedio diario van" v={soles(avg)} />
+        <Stat l="Ingresos van (pedidos actuales)" v={soles(income)} />
         <Stat l="Costo diario promedio" v={soles(data.reduce((s, d) => s + d.costos, 0) / data.length)} />
       </div>
       <Card><p className="mb-2 font-semibold">Costos operativos vs ingresos (incluye depreciación S/ 12/día) · demostrativo</p>

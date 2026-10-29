@@ -36,7 +36,7 @@ const listeners = new Set<() => void>();
 function load() {
   if (loaded || typeof window === "undefined") return;
   loaded = true;
-  try { const raw = localStorage.getItem(KEY); if (raw) state = { ...state, ...JSON.parse(raw) }; } catch { /* ignore */ }
+  try { const raw = localStorage.getItem(KEY); if (raw) state = { ...state, ...JSON.parse(raw) }; if (!state.tariffs?.tramos) state.tariffs = DEFAULT_TARIFFS; } catch { /* ignore */ }
 }
 export function setState(fn: (s: State) => Partial<State>) {
   load();

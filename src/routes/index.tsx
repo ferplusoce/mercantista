@@ -9,7 +9,7 @@ import { VendorCard } from "@/components/VendorCard";
 export const Route = createFileRoute("/")({
   head: () => ({ meta: [
     { title: "Mercantista — Abastece tu bodega desde Unicachi" },
-    { name: "description", content: "Frutas y verduras del Mercado Mayorista Unicachi entregadas en tu taxi de confianza o en nuestra miniván en Lurín." },
+    { name: "description", content: "Frutas y verduras del Mercado Mayorista Unicachi entregadas en tu taxi de confianza o en van compartida hasta tu bodega en Lurín." },
     { property: "og:title", content: "Mercantista — Tu bodega abastecida, sin salir de ella" },
     { property: "og:description", content: "Compramos en Unicachi por ti y entregamos en Lurín y Lima Sur." },
   ] }),
@@ -36,7 +36,7 @@ function Index() {
         <div className="relative max-w-2xl p-6 py-12 text-background md:p-12 md:py-20">
           <span className="rounded-full bg-primary px-3 py-1 text-xs font-semibold text-primary-foreground">Tu bodega abastecida, sin salir de ella</span>
           <h1 className="mt-4 text-3xl font-extrabold leading-tight md:text-5xl">Abastece tu bodega desde el Mercado Mayorista Unicachi sin moverte de tu negocio</h1>
-          <p className="mt-4 text-background/85 md:text-lg">Compramos tus frutas y verduras en los mejores puestos de Unicachi y te las entregamos en tu taxi de confianza o con nuestra miniván.</p>
+          <p className="mt-4 text-background/85 md:text-lg">Compramos tus frutas y verduras en los mejores puestos de Unicachi y te las entregamos en tu taxi de confianza o en van compartida.</p>
           <div className="mt-6 flex flex-col gap-3 sm:flex-row">
             <Link to="/catalogo" className="inline-flex h-12 items-center justify-center rounded-xl bg-primary px-6 font-semibold text-primary-foreground"><ShoppingBag className="mr-2 h-5 w-5" />Explorar catálogo</Link>
             <Link to="/solicitud" search={{ vendor: undefined }} className="inline-flex h-12 items-center justify-center rounded-xl bg-background px-6 font-semibold text-foreground"><ClipboardList className="mr-2 h-5 w-5" />Pedir lista por encargo</Link>
@@ -79,7 +79,7 @@ function Index() {
       <section>
         <SectionTitle title="Cómo funciona" />
         <div className="grid gap-4 md:grid-cols-4">
-          {[[ShoppingBag, "Eliges tus productos", "Selecciona del catálogo o escribe tu lista personalizada."], [Store, "Compramos en Unicachi", "Nuestro equipo compra directo en los puestos que elegiste."], [Truck, "Eliges tu entrega", "A tu taxi de confianza o en nuestra miniván hasta tu bodega."], [ShieldCheck, "Recibes y verificas", "Mercadería fresca lista para la venta del día."]].map(([I, t, d], i) => {
+          {[[ShoppingBag, "Eliges tus productos", "Selecciona del catálogo o escribe tu lista personalizada."], [Store, "Compramos en Unicachi", "Nuestro equipo compra directo en los puestos que elegiste."], [Truck, "Eliges tu entrega", "A tu taxi de confianza o en van compartida hasta tu bodega."], [ShieldCheck, "Recibes y verificas", "Mercadería fresca lista para la venta del día."]].map(([I, t, d], i) => {
             const Icon = I as typeof Store;
             return <div key={i} className="rounded-2xl border bg-card p-5 shadow-sm"><div className="flex items-center gap-3"><span className="grid h-9 w-9 place-items-center rounded-full bg-primary font-bold text-primary-foreground">{i + 1}</span><Icon className="h-5 w-5 text-primary" /></div><p className="mt-3 font-semibold">{t as string}</p><p className="text-sm text-muted-foreground">{d as string}</p></div>;
           })}
