@@ -10,6 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Card, inputCls } from "@/components/Field";
+import { AdminPhotos } from "@/components/PhotoApproval";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({ meta: [
@@ -145,6 +146,7 @@ function Pedidos() {
               </div>
             ))}
             <p className="text-xs text-muted-foreground">Ajusta el precio unitario real comprado y sal del campo para guardar; el total se recalcula.</p>
+            <AdminPhotos o={live} />
             {live.taxi ? <div className="rounded-xl border p-3 text-sm"><p className="font-semibold">Taxi de confianza</p>{live.taxi.driver} · {live.taxi.plate} · {live.taxi.phone}<br />Llega {live.taxi.arrival} a {live.taxi.meeting}</div>
               : <div className="rounded-xl border p-3 text-sm"><p className="font-semibold">Hoja de ruta van compartida</p>Unicachi → {live.zone} · {live.address}<br />{live.slot} · {live.weightKg} kg / {live.packages} bultos · Contacto {live.phone}</div>}
             <p className="text-right text-lg font-bold">Total {soles(live.total)}</p>
