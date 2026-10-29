@@ -214,18 +214,14 @@ function Puestos() {
 function Tarifas() {
   const t = useStore((s) => s.tariffs);
   const set = (p: Partial<typeof t>) => setState((s) => ({ tariffs: { ...s.tariffs, ...p } }));
-  const num = (k: "taxiBase" | "taxiPerExtraPackage" | "taxiFreePackages" | "purchaseFee" | "multiVendorFee" | "earlySlotFee", l: string) => (
-    <label className="text-sm"><span className="text-muted-foreground">{l}</span><input type="number" className={inputCls} value={t[k]} onChange={(e) => set({ [k]: +e.target.value })} /></label>
-  );
   return (
     <div className="space-y-4">
       <Card className="grid gap-3 md:grid-cols-3">
-        {num("taxiBase", "Taxi: tarifa base S/")}{num("taxiPerExtraPackage", "Taxi: S/ por bulto adicional")}{num("taxiFreePackages", "Taxi: bultos incluidos")}
-        {num("purchaseFee", "Miniván: gestión de compra S/")}{num("multiVendorFee", "Adicional 3+ puestos S/")}{num("earlySlotFee", "Adicional turno madrugada S/")}
+        <label className="text-sm"><span className="text-muted-foreground">Taxi: precio fijo por pedido S/</span><input type="number" className={inputCls} value={t.taxiFlat} onChange={(e) => set({ taxiFlat: +e.target.value })} /></label>
       </Card>
       <Card className="overflow-x-auto">
-        <table className="w-full text-sm"><thead className="text-left text-muted-foreground"><tr><th className="p-2">Zona</th><th className="p-2">1–200 kg</th><th className="p-2">201–450 kg</th><th className="p-2">451–750 kg</th></tr></thead>
-          <tbody>{ZONES.map((z) => <tr key={z} className="border-t"><td className="p-2">{z}</td>{t.zones[z].map((p, i) => <td key={i} className="p-2"><input type="number" className="h-9 w-24 rounded-lg border bg-card px-2" value={p} onChange={(e) => { const arr = [...t.zones[z]] as [number, number, number]; arr[i] = +e.target.value; set({ zones: { ...t.zones, [z]: arr } }); }} /></td>)}</tr>)}</tbody>
+        <table className="w-full text-sm"><thead className="text-left text-muted-foreground"><tr><th className="p-2">Van compartida</th><th className="p-2">Hasta 200 kg</th><th className="p-2">Hasta 450 kg</th><th className="p-2">Hasta 750 kg</th></tr></thead>
+          <tbody>{([1, 2] as const).map((n) => <tr key={n} className="border-t"><td className="p-2">Tramo {n}<p className="text-xs text-muted-foreground">{ZONES.filter((z) => t.zoneTramo[z] === n).join(", ")}</p></td>{t.tramos[n].map((p, i) => <td key={i} className="p-2"><input type="number" step="0.5" className="h-9 w-24 rounded-lg border bg-card px-2" value={p} onChange={(e) => { const arr = [...t.tramos[n]] as [number, number, number]; arr[i] = +e.target.value; set({ tramos: { ...t.tramos, [n]: arr } }); }} /></td>)}</tr>)}</tbody>
         </table>
       </Card>
     </div>
