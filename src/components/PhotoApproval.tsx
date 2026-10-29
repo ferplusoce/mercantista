@@ -34,7 +34,7 @@ export function AdminPhotos({ o }: { o: Order }) {
         <span className={`rounded-full px-3 py-1 text-sm font-semibold ${missing ? "bg-secondary text-secondary-foreground" : "bg-success/15 text-success"}`}>{missing ? `Faltan aprobar ${missing} de ${o.items.length}` : "Todo aprobado"}</span>
       </div>
       {times.length > 0 && <p className="text-xs text-muted-foreground">Tiempo de respuesta promedio: <b>{Math.round(times.reduce((a, b) => a + b, 0) / times.length)} min</b></p>}
-      {!canUpload && <p className="text-xs text-muted-foreground">Cambia el pedido a "{"Comprando"}" para subir fotos.</p>}
+      {!canUpload && <p className="text-xs text-muted-foreground">Cambia el pedido a "Comprando en Unicachi" para subir fotos.</p>}
       {o.items.map((it, idx) => {
         const p = photos.find((x) => x.item_index === idx);
         const v = vendors.find((x) => x.id === it.vendorId);
