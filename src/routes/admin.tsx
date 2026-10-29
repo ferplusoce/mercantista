@@ -4,7 +4,9 @@ import { toast } from "sonner";
 import { Bar, BarChart, CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { Lock, Pause, Play, Plus, Trash2 } from "lucide-react";
 import { ZONES, soles, type Vendor, type Availability } from "@/lib/data";
-import { STATUS_FLOW, STATUS_LABEL, setOrderStatus, setState, useStore, type Order, type OrderStatus } from "@/lib/store";
+import { STATUS_FLOW, STATUS_LABEL, setState, useStore, type Order, type OrderStatus } from "@/lib/store";
+import { useAdmin, useAllOrders, useOrderMutations } from "@/lib/orders";
+import { supabase } from "@/integrations/supabase/client";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Card, inputCls } from "@/components/Field";
@@ -20,20 +22,37 @@ export const Route = createFileRoute("/admin")({
   component: Admin,
 });
 
-function Admin() {
-  const [ok, setOk] = useState(false);
-  const [pin, setPin] = useState("");
-  if (!ok) return (
+function Login() {
+  const [email, setEmail] = useState("");
+  const [pass, setPass] = useState("");
+  const go = async () => {
+    const { error } = await supabase.auth.signInWithPassword({ email, password: pass });
+    if (error) toast.error("Correo o contraseña incorrectos");
+  };
+  return (
     <Card className="mx-auto max-w-sm space-y-3 text-center">
       <Lock className="mx-auto h-10 w-10 text-primary" /><h1 className="text-2xl font-bold">Panel administrativo</h1>
-      <p className="text-sm text-muted-foreground">Acceso demostrativo. Clave de prueba: <b>admin2026</b></p>
-      <input type="password" className={inputCls} value={pin} onChange={(e) => setPin(e.target.value)} onKeyDown={(e) => e.key === "Enter" && (pin === "admin2026" ? setOk(true) : toast.error("Clave incorrecta"))} />
-      <button className="h-11 w-full rounded-xl bg-primary font-semibold text-primary-foreground" onClick={() => (pin === "admin2026" ? setOk(true) : toast.error("Clave incorrecta"))}>Ingresar</button>
+      <p className="text-sm text-muted-foreground">Ingresa con tu cuenta de operador.</p>
+      <input type="email" placeholder="Correo" className={inputCls} value={email} onChange={(e) => setEmail(e.target.value)} />
+      <input type="password" placeholder="Contraseña" className={inputCls} value={pass} onChange={(e) => setPass(e.target.value)} onKeyDown={(e) => e.key === "Enter" && go()} />
+      <button className="h-11 w-full rounded-xl bg-primary font-semibold text-primary-foreground" onClick={go}>Ingresar</button>
+    </Card>
+  );
+}
+
+function Admin() {
+  const a = useAdmin();
+  if (a.loading) return <p className="text-center text-muted-foreground">Cargando...</p>;
+  if (!a.email) return <Login />;
+  if (!a.isAdmin) return (
+    <Card className="mx-auto max-w-sm space-y-3 text-center">
+      <p className="font-semibold">{a.email} no tiene permisos de administrador.</p>
+      <button className="h-11 w-full rounded-xl border font-semibold" onClick={() => supabase.auth.signOut()}>Cerrar sesión</button>
     </Card>
   );
   return (
     <div className="space-y-4">
-      <h1 className="text-3xl font-bold">Panel de operaciones</h1>
+      <div className="flex flex-wrap items-center justify-between gap-2"><h1 className="text-3xl font-bold">Panel de operaciones</h1><button className="rounded-lg border px-3 py-1.5 text-sm" onClick={() => supabase.auth.signOut()}>Cerrar sesión ({a.email})</button></div>
       <Tabs defaultValue="resumen">
         <TabsList className="h-auto flex-wrap">
           {["resumen", "pedidos", "productos", "puestos", "tarifas", "reportes"].map((t) => <TabsTrigger key={t} value={t} className="capitalize">{t}</TabsTrigger>)}
@@ -52,7 +71,7 @@ function Admin() {
 function Stat({ l, v }: { l: string; v: string }) { return <Card><p className="text-sm text-muted-foreground">{l}</p><p className="font-display text-2xl font-bold">{v}</p></Card>; }
 
 function Resumen() {
-  const orders = useStore((s) => s.orders).filter((o) => o.status !== "cancelled");
+  const orders = (useAllOrders().data ?? []).filter((o) => o.status !== "cancelled");
   const vendors = useStore((s) => s.vendors);
   const active = orders.filter((o) => o.status !== "delivered");
   const byStatus = STATUS_FLOW.map((s) => ({ name: STATUS_LABEL[s].split(" ")[0], pedidos: orders.filter((o) => o.status === s).length }));
@@ -79,7 +98,9 @@ function Resumen() {
 }
 
 function Pedidos() {
-  const orders = useStore((s) => s.orders);
+  const q = useAllOrders();
+  const orders = q.data ?? [];
+  const m = useOrderMutations();
   const vendors = useStore((s) => s.vendors);
   const [st, setSt] = useState("");
   const [sv, setSv] = useState("");
@@ -101,11 +122,12 @@ function Pedidos() {
             <tr key={o.code} className="border-t">
               <td className="p-2"><button className="font-semibold text-primary" onClick={() => setOpen(o)}>{o.code}</button></td>
               <td className="p-2">{o.business}</td><td className="p-2">{o.service === "taxi_delivery" ? "🚕 Taxi" : "🚐 Miniván"}</td><td className="p-2 tabular-nums">{soles(o.total)}</td>
-              <td className="p-2"><select className="h-9 rounded-lg border bg-card px-2" value={o.status} onChange={(e) => { setOrderStatus(o.code, e.target.value as OrderStatus); toast.success(`${o.code}: ${STATUS_LABEL[e.target.value as OrderStatus]}`); }}>{[...STATUS_FLOW, "cancelled" as const].map((s) => <option key={s} value={s}>{STATUS_LABEL[s]}</option>)}</select></td>
+              <td className="p-2"><select className="h-9 rounded-lg border bg-card px-2" value={o.status} onChange={(e) => { const ns = e.target.value as OrderStatus; m.setStatus(o, ns).then(() => toast.success(`${o.code}: ${STATUS_LABEL[ns]}`), () => toast.error("No se pudo cambiar el estado")); }}>{[...STATUS_FLOW, "cancelled" as const].map((s) => <option key={s} value={s}>{STATUS_LABEL[s]}</option>)}</select></td>
             </tr>
           ))}</tbody>
         </table>
-        {list.length === 0 && <p className="p-6 text-center text-muted-foreground">Sin pedidos con esos filtros.</p>}
+        {q.isLoading && <p className="p-6 text-center text-muted-foreground">Cargando pedidos...</p>}
+        {!q.isLoading && list.length === 0 && <p className="p-6 text-center text-muted-foreground">Sin pedidos con esos filtros.</p>}
       </div>
       <Dialog open={!!live} onOpenChange={() => setOpen(null)}>
         <DialogContent className="max-h-[90vh] overflow-y-auto rounded-2xl">
@@ -116,13 +138,13 @@ function Pedidos() {
               <div key={v.id} className="rounded-xl bg-muted p-3 text-sm"><p className="font-semibold">{v.stall} · {v.name}</p>
                 {live.items.filter((i) => i.vendorId === v.id).map((i, idx) => (
                   <div key={idx} className="mt-1 flex items-center justify-between gap-2"><span>{i.qty} × {i.name} {i.note && <em className="text-muted-foreground">({i.note})</em>}</span>
-                    <input type="number" step="0.5" aria-label="Precio real" className="h-8 w-24 rounded-lg border bg-card px-2 text-right" value={i.unitPrice}
-                      onChange={(e) => { const price = +e.target.value; setState((s) => ({ orders: s.orders.map((o) => { if (o.code !== live.code) return o; const items = o.items.map((x) => (x === i ? { ...x, unitPrice: price } : x)); const subtotal = items.reduce((a, x) => a + x.qty * x.unitPrice, 0); return { ...o, items, subtotal, total: subtotal + o.serviceFee + o.shippingFee }; }) })); }} />
+                    <input type="number" step="0.5" aria-label="Precio real" className="h-8 w-24 rounded-lg border bg-card px-2 text-right" key={`${live.code}-${idx}-${i.unitPrice}`} defaultValue={i.unitPrice}
+                      onBlur={(e) => { const price = +e.target.value; if (price !== i.unitPrice) m.setItemPrice(live, live.items.indexOf(i), price).then(() => toast.success("Precio actualizado"), () => toast.error("No se pudo guardar el precio")); }} />
                   </div>
                 ))}
               </div>
             ))}
-            <p className="text-xs text-muted-foreground">Ajusta el precio unitario real comprado; el total se recalcula.</p>
+            <p className="text-xs text-muted-foreground">Ajusta el precio unitario real comprado y sal del campo para guardar; el total se recalcula.</p>
             {live.taxi ? <div className="rounded-xl border p-3 text-sm"><p className="font-semibold">Taxi de confianza</p>{live.taxi.driver} · {live.taxi.plate} · {live.taxi.phone}<br />Llega {live.taxi.arrival} a {live.taxi.meeting}</div>
               : <div className="rounded-xl border p-3 text-sm"><p className="font-semibold">Hoja de ruta miniván</p>Unicachi → {live.zone} · {live.address}<br />{live.slot} · {live.weightKg} kg / {live.packages} bultos · Contacto {live.phone}</div>}
             <p className="text-right text-lg font-bold">Total {soles(live.total)}</p>
@@ -212,7 +234,7 @@ function Tarifas() {
 
 function Reportes() {
   const costs = useStore((s) => s.costs);
-  const orders = useStore((s) => s.orders).filter((o) => o.service === "minivan_delivery");
+  const orders = (useAllOrders().data ?? []).filter((o) => o.service === "minivan_delivery");
   const income = orders.reduce((s, o) => s + o.serviceFee + o.shippingFee, 0);
   const data = costs.map((c, i) => { const cost = c.fuel + c.driver + c.maintenance + c.other + 12; const ing = 160 + ((i * 37) % 90); return { dia: c.date, costos: cost, ingresos: ing, margen: ing - cost }; });
   const avg = data.reduce((s, d) => s + d.margen, 0) / data.length;
