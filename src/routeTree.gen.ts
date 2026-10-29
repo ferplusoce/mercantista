@@ -15,6 +15,7 @@ import { Route as CarritoRouteImport } from './routes/carrito'
 import { Route as CatalogoRouteImport } from './routes/catalogo'
 import { Route as CheckoutRouteImport } from './routes/checkout'
 import { Route as CuentaRouteImport } from './routes/cuenta'
+import { Route as OpinionRouteImport } from './routes/opinion'
 import { Route as SeguimientoRouteImport } from './routes/seguimiento'
 import { Route as ServiciosRouteImport } from './routes/servicios'
 import { Route as SolicitudRouteImport } from './routes/solicitud'
@@ -51,6 +52,11 @@ const CuentaRoute = CuentaRouteImport.update({
   path: '/cuenta',
   getParentRoute: () => rootRouteImport,
 } as any)
+const OpinionRoute = OpinionRouteImport.update({
+  id: '/opinion',
+  path: '/opinion',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SeguimientoRoute = SeguimientoRouteImport.update({
   id: '/seguimiento',
   path: '/seguimiento',
@@ -84,6 +90,7 @@ export interface FileRoutesByFullPath {
   '/catalogo': typeof CatalogoRoute
   '/checkout': typeof CheckoutRoute
   '/cuenta': typeof CuentaRoute
+  '/opinion': typeof OpinionRoute
   '/seguimiento': typeof SeguimientoRoute
   '/servicios': typeof ServiciosRoute
   '/solicitud': typeof SolicitudRoute
@@ -97,6 +104,7 @@ export interface FileRoutesByTo {
   '/catalogo': typeof CatalogoRoute
   '/checkout': typeof CheckoutRoute
   '/cuenta': typeof CuentaRoute
+  '/opinion': typeof OpinionRoute
   '/seguimiento': typeof SeguimientoRoute
   '/servicios': typeof ServiciosRoute
   '/solicitud': typeof SolicitudRoute
@@ -111,6 +119,7 @@ export interface FileRoutesById {
   '/catalogo': typeof CatalogoRoute
   '/checkout': typeof CheckoutRoute
   '/cuenta': typeof CuentaRoute
+  '/opinion': typeof OpinionRoute
   '/seguimiento': typeof SeguimientoRoute
   '/servicios': typeof ServiciosRoute
   '/solicitud': typeof SolicitudRoute
@@ -126,6 +135,7 @@ export interface FileRouteTypes {
     | '/catalogo'
     | '/checkout'
     | '/cuenta'
+    | '/opinion'
     | '/seguimiento'
     | '/servicios'
     | '/solicitud'
@@ -139,6 +149,7 @@ export interface FileRouteTypes {
     | '/catalogo'
     | '/checkout'
     | '/cuenta'
+    | '/opinion'
     | '/seguimiento'
     | '/servicios'
     | '/solicitud'
@@ -152,6 +163,7 @@ export interface FileRouteTypes {
     | '/catalogo'
     | '/checkout'
     | '/cuenta'
+    | '/opinion'
     | '/seguimiento'
     | '/servicios'
     | '/solicitud'
@@ -166,6 +178,7 @@ export interface RootRouteChildren {
   CatalogoRoute: typeof CatalogoRoute
   CheckoutRoute: typeof CheckoutRoute
   CuentaRoute: typeof CuentaRoute
+  OpinionRoute: typeof OpinionRoute
   SeguimientoRoute: typeof SeguimientoRoute
   ServiciosRoute: typeof ServiciosRoute
   SolicitudRoute: typeof SolicitudRoute
@@ -217,6 +230,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CuentaRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/opinion': {
+      id: '/opinion'
+      path: '/opinion'
+      fullPath: '/opinion'
+      preLoaderRoute: typeof OpinionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/seguimiento': {
       id: '/seguimiento'
       path: '/seguimiento'
@@ -262,6 +282,7 @@ const rootRouteChildren: RootRouteChildren = {
   CatalogoRoute: CatalogoRoute,
   CheckoutRoute: CheckoutRoute,
   CuentaRoute: CuentaRoute,
+  OpinionRoute: OpinionRoute,
   SeguimientoRoute: SeguimientoRoute,
   ServiciosRoute: ServiciosRoute,
   SolicitudRoute: SolicitudRoute,
