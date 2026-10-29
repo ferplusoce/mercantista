@@ -57,8 +57,10 @@ export type Database = {
           order_code: string
           photo_url: string | null
           real_price: number | null
+          responded_at: string | null
           status: string
           updated_at: string
+          uploaded_at: string
         }
         Insert: {
           client_comment?: string | null
@@ -67,8 +69,10 @@ export type Database = {
           order_code: string
           photo_url?: string | null
           real_price?: number | null
+          responded_at?: string | null
           status?: string
           updated_at?: string
+          uploaded_at?: string
         }
         Update: {
           client_comment?: string | null
@@ -77,8 +81,10 @@ export type Database = {
           order_code?: string
           photo_url?: string | null
           real_price?: number | null
+          responded_at?: string | null
           status?: string
           updated_at?: string
+          uploaded_at?: string
         }
         Relationships: [
           {
@@ -230,12 +236,42 @@ export type Database = {
           isSetofReturn: true
         }
       }
+      get_order_photos: {
+        Args: { _code: string }
+        Returns: {
+          client_comment: string | null
+          id: string
+          item_index: number
+          order_code: string
+          photo_url: string | null
+          real_price: number | null
+          responded_at: string | null
+          status: string
+          updated_at: string
+          uploaded_at: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "order_items_photos"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
           _user_id: string
         }
         Returns: boolean
+      }
+      respond_photo: {
+        Args: {
+          _approve: boolean
+          _code: string
+          _comment?: string
+          _item_index: number
+        }
+        Returns: string
       }
     }
     Enums: {
