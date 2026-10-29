@@ -16,28 +16,58 @@ export type Database = {
     Tables: {
       opinions: {
         Row: {
+          armo_sin_ayuda: boolean | null
+          codigo_encuestador: string | null
+          comentario: string | null
           comment: string | null
           created_at: string
           id: string
+          lo_usaria: string | null
           name: string | null
           order_code: string | null
+          precio_justo: string | null
           rating: number | null
+          satisfaccion: number | null
+          servicio_preferido: string | null
+          tiempo_segundos: number | null
+          whatsapp: string | null
+          zona: string | null
         }
         Insert: {
+          armo_sin_ayuda?: boolean | null
+          codigo_encuestador?: string | null
+          comentario?: string | null
           comment?: string | null
           created_at?: string
           id?: string
+          lo_usaria?: string | null
           name?: string | null
           order_code?: string | null
+          precio_justo?: string | null
           rating?: number | null
+          satisfaccion?: number | null
+          servicio_preferido?: string | null
+          tiempo_segundos?: number | null
+          whatsapp?: string | null
+          zona?: string | null
         }
         Update: {
+          armo_sin_ayuda?: boolean | null
+          codigo_encuestador?: string | null
+          comentario?: string | null
           comment?: string | null
           created_at?: string
           id?: string
+          lo_usaria?: string | null
           name?: string | null
           order_code?: string | null
+          precio_justo?: string | null
           rating?: number | null
+          satisfaccion?: number | null
+          servicio_preferido?: string | null
+          tiempo_segundos?: number | null
+          whatsapp?: string | null
+          zona?: string | null
         }
         Relationships: [
           {

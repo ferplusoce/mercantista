@@ -15,6 +15,13 @@
       "when": 1793311917262,
       "tag": "0001_photo_approval",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1793312196330,
+      "tag": "0002_opinions_experiment2",
+      "breakpoints": true
     }
   ]
 }
