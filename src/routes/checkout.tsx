@@ -4,7 +4,8 @@ import { Car, CheckCircle2, Download, MessageCircle, Truck } from "lucide-react"
 import { toast } from "sonner";
 import { SLOTS, ZONES, soles, waLink } from "@/lib/data";
 import { minivanFee, taxiFee } from "@/lib/pricing";
-import { cartSummary, clearCart, nextCode, setState, useStore, type Order } from "@/lib/store";
+import { createOrder } from "@/lib/orders";
+import { cartSummary, clearCart, setState, useStore, type Order } from "@/lib/store";
 import { Card, Field, inputCls, requireFields } from "@/components/Field";
 
 export const Route = createFileRoute("/checkout")({
@@ -41,7 +42,8 @@ function Checkout() {
   const shippingFee = service === "taxi_delivery" ? 0 : mv.shipping;
   const total = sum.subtotal + serviceFee + shippingFee;
 
-  const confirm = () => {
+  const [saving, setSaving] = useState(false);
+  const confirm = async () => {
     const keys = ["business", "contact", "phone", "date", ...(service === "taxi_delivery" ? ["driver", "plate", "dphone", "arrival", "meeting"] : ["address"])];
     const e = requireFields(f, keys);
     if (f.dphone && !/^9\d{8}$/.test(f.dphone)) e.dphone = "Celular de 9 dígitos";
@@ -50,7 +52,7 @@ function Checkout() {
     setErr(e);
     if (Object.keys(e).length) { toast.error("Completa los campos obligatorios"); return; }
     const o: Order = {
-      code: nextCode(), createdAt: new Date().toISOString(), business: f.business, contact: f.contact, phone: f.phone, service, status: "received",
+      code: "", createdAt: new Date().toISOString(), business: f.business, contact: f.contact, phone: f.phone, service, status: "received",
       items: sum.lines.map((l) => ({ productId: l.productId, name: l.product.name, vendorId: l.product.vendorId, qty: l.qty, unitPrice: l.product.price, unit: l.product.unit, weightKg: l.product.weightKg, note: l.note })),
       subtotal: sum.subtotal, serviceFee, shippingFee, total, weightKg: sum.weightKg, packages: sum.packages,
       paymentPlan: f.plan, paymentMethod: f.method, paymentStatus: "pending", deliveryDate: f.date, slot: service === "taxi_delivery" ? `Taxi llega ${f.arrival}` : f.slot,
@@ -58,6 +60,8 @@ function Checkout() {
       taxi: service === "taxi_delivery" ? { driver: f.driver, plate: f.plate.toUpperCase(), phone: f.dphone, arrival: f.arrival, meeting: f.meeting } : undefined,
       history: [{ status: "received", at: new Date().toISOString() }],
     };
+    setSaving(true);
+    try { o.code = await createOrder(o); } catch { toast.error("No pudimos guardar tu pedido. Revisa tu conexión e inténtalo otra vez."); return; } finally { setSaving(false); }
     setState((s) => ({ orders: [o, ...s.orders] }));
     clearCart();
     toast.success(`Pedido ${o.code} registrado`);
@@ -127,7 +131,7 @@ function Checkout() {
           {service === "minivan_delivery" && <div className="flex justify-between"><span>Transporte y entrega</span><span className="tabular-nums">{soles(shippingFee)}</span></div>}
         </div>
         <div className="flex justify-between border-t pt-3 text-lg font-bold"><span>Total estimado</span><span className="tabular-nums">{soles(total)}</span></div>
-        <button onClick={confirm} className="h-12 w-full rounded-xl bg-primary font-semibold text-primary-foreground">Confirmar y enviar pedido</button>
+        <button onClick={confirm} disabled={saving} className="h-12 w-full rounded-xl bg-primary font-semibold text-primary-foreground disabled:opacity-60">{saving ? "Enviando pedido..." : "Confirmar y enviar pedido"}</button>
       </aside>
     </div>
   );

@@ -4,6 +4,7 @@ import { Check, MessageCircle, PackageSearch } from "lucide-react";
 import { soles, waLink } from "@/lib/data";
 import { STATUS_FLOW, STATUS_LABEL, useStore, type Order } from "@/lib/store";
 import { Card } from "@/components/Field";
+import { useOrderByCode } from "@/lib/orders";
 
 export const Route = createFileRoute("/seguimiento")({
   validateSearch: (s: Record<string, unknown>) => ({ code: s.code as string | undefined }),
@@ -31,7 +32,8 @@ function Seguimiento() {
   const nav = useNavigate();
   const [q, setQ] = useState(code ?? "");
   const orders = useStore((s) => s.orders);
-  const o = code ? orders.find((x) => x.code.toUpperCase() === code.toUpperCase()) : undefined;
+  const { data: found, isLoading, isError } = useOrderByCode(code);
+  const o = found ?? undefined;
   const idx = o ? STATUS_FLOW.indexOf(o.status) : -1;
   return (
     <div className="mx-auto max-w-2xl space-y-5">
@@ -40,8 +42,10 @@ function Seguimiento() {
         <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Ej. MCT-2026-0842" className="h-12 flex-1 rounded-xl border bg-card px-4 uppercase" />
         <button className="h-12 rounded-xl bg-primary px-5 font-semibold text-primary-foreground">Consultar</button>
       </form>
-      <div className="flex flex-wrap gap-2 text-sm text-muted-foreground">Pedidos recientes: {orders.slice(0, 4).map((x) => <button key={x.code} onClick={() => { setQ(x.code); nav({ to: "/seguimiento", search: { code: x.code } }); }} className="rounded-full border px-2.5 py-0.5">{x.code}</button>)}</div>
-      {code && !o && <Card className="text-center"><PackageSearch className="mx-auto h-10 w-10 text-muted-foreground" /><p className="mt-2 font-semibold">No encontramos el pedido {code}</p><p className="text-sm text-muted-foreground">Revisa el código o escríbenos por WhatsApp.</p></Card>}
+      <div className="flex flex-wrap gap-2 text-sm text-muted-foreground">{orders.length > 0 && "Tus pedidos recientes: "}{orders.slice(0, 4).map((x) => <button key={x.code} onClick={() => { setQ(x.code); nav({ to: "/seguimiento", search: { code: x.code } }); }} className="rounded-full border px-2.5 py-0.5">{x.code}</button>)}</div>
+      {code && isLoading && <p className="text-center text-muted-foreground">Buscando pedido...</p>}
+      {code && isError && <p className="text-center text-destructive">No pudimos consultar el pedido. Inténtalo de nuevo.</p>}
+      {code && !isLoading && !isError && !o && <Card className="text-center"><PackageSearch className="mx-auto h-10 w-10 text-muted-foreground" /><p className="mt-2 font-semibold">No encontramos el pedido {code}</p><p className="text-sm text-muted-foreground">Revisa el código o escríbenos por WhatsApp.</p></Card>}
       {o && (
         <Card className="space-y-5">
           <div className="flex flex-wrap items-center justify-between gap-2">
