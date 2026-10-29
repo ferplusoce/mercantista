@@ -14,16 +14,232 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      opinions: {
+        Row: {
+          comment: string | null
+          created_at: string
+          id: string
+          name: string | null
+          order_code: string | null
+          rating: number | null
+        }
+        Insert: {
+          comment?: string | null
+          created_at?: string
+          id?: string
+          name?: string | null
+          order_code?: string | null
+          rating?: number | null
+        }
+        Update: {
+          comment?: string | null
+          created_at?: string
+          id?: string
+          name?: string | null
+          order_code?: string | null
+          rating?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "opinions_order_code_fkey"
+            columns: ["order_code"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["code"]
+          },
+        ]
+      }
+      order_items_photos: {
+        Row: {
+          client_comment: string | null
+          id: string
+          item_index: number
+          order_code: string
+          photo_url: string | null
+          real_price: number | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          client_comment?: string | null
+          id?: string
+          item_index: number
+          order_code: string
+          photo_url?: string | null
+          real_price?: number | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          client_comment?: string | null
+          id?: string
+          item_index?: number
+          order_code?: string
+          photo_url?: string | null
+          real_price?: number | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_items_photos_order_code_fkey"
+            columns: ["order_code"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["code"]
+          },
+        ]
+      }
+      orders: {
+        Row: {
+          address: string | null
+          business: string
+          code: string
+          contact: string
+          created_at: string
+          delivery_date: string | null
+          history: Json
+          id: string
+          items: Json
+          packages: number
+          payment_method: string | null
+          payment_plan: string | null
+          payment_status: string
+          phone: string
+          service: string
+          service_fee: number
+          shipping_fee: number
+          slot: string | null
+          status: string
+          subtotal: number
+          taxi: Json | null
+          total: number
+          weight_kg: number
+          zone: string | null
+        }
+        Insert: {
+          address?: string | null
+          business: string
+          code?: string
+          contact: string
+          created_at?: string
+          delivery_date?: string | null
+          history?: Json
+          id?: string
+          items?: Json
+          packages?: number
+          payment_method?: string | null
+          payment_plan?: string | null
+          payment_status?: string
+          phone: string
+          service: string
+          service_fee?: number
+          shipping_fee?: number
+          slot?: string | null
+          status?: string
+          subtotal?: number
+          taxi?: Json | null
+          total?: number
+          weight_kg?: number
+          zone?: string | null
+        }
+        Update: {
+          address?: string | null
+          business?: string
+          code?: string
+          contact?: string
+          created_at?: string
+          delivery_date?: string | null
+          history?: Json
+          id?: string
+          items?: Json
+          packages?: number
+          payment_method?: string | null
+          payment_plan?: string | null
+          payment_status?: string
+          phone?: string
+          service?: string
+          service_fee?: number
+          shipping_fee?: number
+          slot?: string | null
+          status?: string
+          subtotal?: number
+          taxi?: Json | null
+          total?: number
+          weight_kg?: number
+          zone?: string | null
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      create_order: { Args: { p: Json }; Returns: string }
+      get_order_by_code: {
+        Args: { _code: string }
+        Returns: {
+          address: string | null
+          business: string
+          code: string
+          contact: string
+          created_at: string
+          delivery_date: string | null
+          history: Json
+          id: string
+          items: Json
+          packages: number
+          payment_method: string | null
+          payment_plan: string | null
+          payment_status: string
+          phone: string
+          service: string
+          service_fee: number
+          shipping_fee: number
+          slot: string | null
+          status: string
+          subtotal: number
+          taxi: Json | null
+          total: number
+          weight_kg: number
+          zone: string | null
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "orders"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "user"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +366,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "user"],
+    },
   },
 } as const
