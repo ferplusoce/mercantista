@@ -22,7 +22,7 @@ export function AdminPhotos({ o }: { o: Order }) {
   const onFile = async (idx: number, file?: File) => {
     if (!file) return;
     const price = +(prices[idx] ?? o.items[idx].unitPrice);
-    if (!(price > 0)) return toast.error("Escribe el precio real");
+    if (!(price > 0)) { toast.error("Escribe el precio real"); return; }
     setBusy(idx);
     try { await act.upload(idx, file, price); toast.success("Foto enviada al cliente"); } catch { toast.error("No se pudo subir la foto"); } finally { setBusy(null); }
   };
