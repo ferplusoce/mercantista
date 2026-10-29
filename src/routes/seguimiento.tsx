@@ -20,7 +20,7 @@ export const Route = createFileRoute("/seguimiento")({
 function detail(o: Order, s: string) {
   const d: Record<string, string> = {
     received: "Mercantista registró la orden.", verifying: "Coordinando con los vendedores de Unicachi.", purchasing: "Compra física y selección de calidad en proceso.",
-    staging: o.service === "taxi_delivery" ? `Esperando o cargando el taxi placa ${o.taxi?.plate} en ${o.taxi?.meeting}.` : "Cargado en la miniván Mercantista, iniciando ruta a Lurín.",
+    staging: o.service === "taxi_delivery" ? `Esperando o cargando el taxi placa ${o.taxi?.plate} en ${o.taxi?.meeting}.` : "Cargado en la van compartida, iniciando ruta a Lurín.",
     on_the_way: o.service === "taxi_delivery" ? "Tu taxi va en camino con la mercadería." : `En ruta a ${o.zone}. Llegada estimada: 40 min.`,
     delivered: "Mercadería recibida y verificada.",
   };
@@ -49,7 +49,7 @@ function Seguimiento() {
       {o && (
         <Card className="space-y-5">
           <div className="flex flex-wrap items-center justify-between gap-2">
-            <div><p className="font-display text-2xl font-bold">{o.code}</p><p className="text-sm text-muted-foreground">{o.business} · {o.service === "taxi_delivery" ? "Taxi de confianza" : "Miniván Mercantista"} · {o.deliveryDate}</p></div>
+            <div><p className="font-display text-2xl font-bold">{o.code}</p><p className="text-sm text-muted-foreground">{o.business} · {o.service === "taxi_delivery" ? "Taxi de confianza" : "Entrega en tu bodega (van compartida)"} · {o.deliveryDate}</p></div>
             <p className="font-bold">{soles(o.total)}</p>
           </div>
           {o.status === "cancelled" ? <p className="rounded-xl bg-destructive/10 p-3 text-destructive">Pedido cancelado</p> : (
