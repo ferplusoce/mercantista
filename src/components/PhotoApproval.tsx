@@ -20,7 +20,7 @@ export function AdminPhotos({ o }: { o: Order }) {
   const canUpload = o.status === "purchasing";
 
   const onFile = async (idx: number, file?: File) => {
-    if (!file) return;
+    if (!file) { return; }
     const price = +(prices[idx] ?? o.items[idx].unitPrice);
     if (!(price > 0)) { toast.error("Escribe el precio real"); return; }
     setBusy(idx);
