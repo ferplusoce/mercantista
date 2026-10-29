@@ -9,7 +9,7 @@ import { VendorCard } from "@/components/VendorCard";
 export const Route = createFileRoute("/")({
   head: () => ({ meta: [
     { title: "Mercantista — Abastece tu bodega desde Unicachi" },
-    { name: "description", content: "Frutas y verduras del Mercado Mayorista Unicachi entregadas en tu taxi de confianza o en nuestra miniván en Lurín." },
+    { name: "description", content: "Frutas y verduras del Mercado Mayorista Unicachi entregadas en tu taxi de confianza o en van compartida hasta tu bodega en Lurín." },
     { property: "og:title", content: "Mercantista — Tu bodega abastecida, sin salir de ella" },
     { property: "og:description", content: "Compramos en Unicachi por ti y entregamos en Lurín y Lima Sur." },
   ] }),
