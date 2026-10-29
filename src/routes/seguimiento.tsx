@@ -5,6 +5,7 @@ import { soles, waLink } from "@/lib/data";
 import { STATUS_FLOW, STATUS_LABEL, useStore, type Order } from "@/lib/store";
 import { Card } from "@/components/Field";
 import { useOrderByCode } from "@/lib/orders";
+import { ClientPhotos } from "@/components/PhotoApproval";
 
 export const Route = createFileRoute("/seguimiento")({
   validateSearch: (s: Record<string, unknown>) => ({ code: s.code as string | undefined }),
@@ -65,6 +66,7 @@ function Seguimiento() {
               ))}
             </ol>
           )}
+          <ClientPhotos o={o} />
           <div className="rounded-xl bg-muted p-4 text-sm">
             <p className="font-semibold">Coordinador de turno en Unicachi</p><p className="text-muted-foreground">Carlos Medina (dato demostrativo)</p>
             <a href={waLink(`Hola Mercantista, quiero consultar sobre mi pedido ${o.code}`)} target="_blank" rel="noreferrer" className="mt-3 inline-flex h-11 items-center rounded-xl bg-success px-4 font-semibold text-success-foreground"><MessageCircle className="mr-2 h-4 w-4" />Escribir por WhatsApp</a>
