@@ -22,6 +22,13 @@
       "when": 1793312196330,
       "tag": "0002_opinions_experiment2",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1793319752290,
+      "tag": "0003_opinions_insert_check",
+      "breakpoints": true
     }
   ]
 }
