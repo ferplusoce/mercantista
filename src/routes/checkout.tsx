@@ -5,6 +5,8 @@ import { toast } from "sonner";
 import { SLOTS, ZONES, soles, waLink } from "@/lib/data";
 import { vanFee, taxiFee } from "@/lib/pricing";
 import { createOrder } from "@/lib/orders";
+import { markOrderSent } from "@/lib/opinions";
+import { OpinionForm } from "@/components/OpinionForm";
 import { cartSummary, clearCart, setState, useStore, type Order } from "@/lib/store";
 import { Card, Field, inputCls, requireFields } from "@/components/Field";
 
@@ -32,6 +34,7 @@ function Checkout() {
   const [f, setF] = useState<Record<string, string>>({ business: "", contact: "", phone: "", date: new Date(Date.now() + 864e5).toISOString().slice(0, 10), slot: SLOTS[0], zone: ZONES[0], address: "", driver: "", plate: "", dphone: "", arrival: "05:00", meeting: "Puerta 2", plan: PLANS[0], method: METHODS[0], doc: "", razon: "", billAddr: "" });
   const [err, setErr] = useState<Record<string, string>>({});
   const [done, setDone] = useState<Order | null>(null);
+  const [saving, setSaving] = useState(false);
   const set = (k: string) => (e: { target: { value: string } }) => setF({ ...f, [k]: e.target.value });
 
   if (done) return <Success o={done} />;
@@ -42,7 +45,6 @@ function Checkout() {
   const shippingFee = 0;
   const total = sum.subtotal + serviceFee + shippingFee;
 
-  const [saving, setSaving] = useState(false);
   const confirm = async () => {
     const keys = ["business", "contact", "phone", "date", ...(service === "taxi_delivery" ? ["driver", "plate", "dphone", "arrival", "meeting"] : ["address"])];
     const e = requireFields(f, keys);
@@ -63,6 +65,7 @@ function Checkout() {
     setSaving(true);
     try { o.code = await createOrder(o); } catch { toast.error("No pudimos guardar tu pedido. Revisa tu conexión e inténtalo otra vez."); return; } finally { setSaving(false); }
     setState((s) => ({ orders: [o, ...s.orders] }));
+    markOrderSent(o.code);
     clearCart();
     toast.success(`Pedido ${o.code} registrado`);
     setDone(o);
@@ -151,6 +154,7 @@ function Success({ o }: { o: Order }) {
         <a href={waLink(text)} target="_blank" rel="noreferrer" className="flex h-12 items-center justify-center rounded-xl bg-success font-semibold text-success-foreground"><MessageCircle className="mr-2 h-5 w-5" />Compartir por WhatsApp</a>
         <button onClick={() => window.print()} className="flex h-12 items-center justify-center rounded-xl border font-semibold"><Download className="mr-2 h-5 w-5" />Descargar resumen PDF</button>
       </div>
+      <div className="mt-6 text-left"><OpinionForm /></div>
     </Card>
   );
 }

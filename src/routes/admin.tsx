@@ -11,6 +11,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Card, inputCls } from "@/components/Field";
 import { AdminPhotos } from "@/components/PhotoApproval";
+import { useServerFn } from "@tanstack/react-start";
+import { loginWithAdminKey } from "@/lib/admin-key.functions";
+import { Experimento2 } from "@/components/Experimento2";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({ meta: [
@@ -24,19 +27,21 @@ export const Route = createFileRoute("/admin")({
 });
 
 function Login() {
-  const [email, setEmail] = useState("");
-  const [pass, setPass] = useState("");
+  const [key, setKey] = useState("");
+  const [busy, setBusy] = useState(false);
+  const login = useServerFn(loginWithAdminKey);
   const go = async () => {
-    const { error } = await supabase.auth.signInWithPassword({ email, password: pass });
-    if (error) toast.error("Correo o contraseña incorrectos");
+    if (!key) return;
+    setBusy(true);
+    try { const t = await login({ data: { key } }); await supabase.auth.setSession(t); setKey(""); }
+    catch { toast.error("Clave incorrecta"); } finally { setBusy(false); }
   };
   return (
     <Card className="mx-auto max-w-sm space-y-3 text-center">
       <Lock className="mx-auto h-10 w-10 text-primary" /><h1 className="text-2xl font-bold">Panel administrativo</h1>
-      <p className="text-sm text-muted-foreground">Ingresa con tu cuenta de operador.</p>
-      <input type="email" placeholder="Correo" className={inputCls} value={email} onChange={(e) => setEmail(e.target.value)} />
-      <input type="password" placeholder="Contraseña" className={inputCls} value={pass} onChange={(e) => setPass(e.target.value)} onKeyDown={(e) => e.key === "Enter" && go()} />
-      <button className="h-11 w-full rounded-xl bg-primary font-semibold text-primary-foreground" onClick={go}>Ingresar</button>
+      <p className="text-sm text-muted-foreground">Ingresa la clave del operador.</p>
+      <input type="password" autoComplete="off" placeholder="Clave" className={inputCls} value={key} onChange={(e) => setKey(e.target.value)} onKeyDown={(e) => e.key === "Enter" && go()} />
+      <button disabled={busy} className="h-11 w-full rounded-xl bg-primary font-semibold text-primary-foreground disabled:opacity-60" onClick={go}>{busy ? "Verificando..." : "Ingresar"}</button>
     </Card>
   );
 }
@@ -53,10 +58,11 @@ function Admin() {
   );
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap items-center justify-between gap-2"><h1 className="text-3xl font-bold">Panel de operaciones</h1><button className="rounded-lg border px-3 py-1.5 text-sm" onClick={() => supabase.auth.signOut()}>Cerrar sesión ({a.email})</button></div>
+      <div className="flex flex-wrap items-center justify-between gap-2"><h1 className="text-3xl font-bold">Panel de operaciones</h1><button className="rounded-lg border px-3 py-1.5 text-sm" onClick={() => supabase.auth.signOut()}>Cerrar sesión</button></div>
       <Tabs defaultValue="resumen">
         <TabsList className="h-auto flex-wrap">
           {["resumen", "pedidos", "productos", "puestos", "tarifas", "reportes"].map((t) => <TabsTrigger key={t} value={t} className="capitalize">{t}</TabsTrigger>)}
+          <TabsTrigger value="exp2">Experimento 2</TabsTrigger>
         </TabsList>
         <TabsContent value="resumen"><Resumen /></TabsContent>
         <TabsContent value="pedidos"><Pedidos /></TabsContent>
@@ -64,6 +70,7 @@ function Admin() {
         <TabsContent value="puestos"><Puestos /></TabsContent>
         <TabsContent value="tarifas"><Tarifas /></TabsContent>
         <TabsContent value="reportes"><Reportes /></TabsContent>
+        <TabsContent value="exp2"><Experimento2 /></TabsContent>
       </Tabs>
     </div>
   );
