@@ -5,6 +5,7 @@ import { CATEGORIES } from "@/lib/data";
 import { useStore } from "@/lib/store";
 import { ProductCard } from "@/components/ProductCard";
 import { VendorCard } from "@/components/VendorCard";
+import { InstallButton } from "@/components/InstallButton";
 
 export const Route = createFileRoute("/")({
   head: () => ({ meta: [
@@ -41,6 +42,7 @@ function Index() {
             <Link to="/catalogo" className="inline-flex h-12 items-center justify-center rounded-xl bg-primary px-6 font-semibold text-primary-foreground"><ShoppingBag className="mr-2 h-5 w-5" />Explorar catálogo</Link>
             <Link to="/solicitud" search={{ vendor: undefined }} className="inline-flex h-12 items-center justify-center rounded-xl bg-background px-6 font-semibold text-foreground"><ClipboardList className="mr-2 h-5 w-5" />Pedir lista por encargo</Link>
             <Link to="/opinion" className="inline-flex h-12 items-center justify-center rounded-xl border-2 border-background px-6 font-semibold text-background">Danos tu opinión</Link>
+            <InstallButton />
           </div>
         </div>
       </section>
