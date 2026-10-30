@@ -14,6 +14,7 @@ import { Header, MobileNav, Footer } from "@/components/Shell";
 import { Toaster } from "@/components/ui/sonner";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
+import { trackAppOpen } from "@/lib/opinions";
 
 function NotFoundComponent() {
   return (
@@ -117,6 +118,7 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  useEffect(() => { trackAppOpen(); }, []);
 
   return (
     <QueryClientProvider client={queryClient}>

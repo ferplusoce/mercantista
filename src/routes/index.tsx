@@ -40,6 +40,7 @@ function Index() {
           <div className="mt-6 flex flex-col gap-3 sm:flex-row">
             <Link to="/catalogo" className="inline-flex h-12 items-center justify-center rounded-xl bg-primary px-6 font-semibold text-primary-foreground"><ShoppingBag className="mr-2 h-5 w-5" />Explorar catálogo</Link>
             <Link to="/solicitud" search={{ vendor: undefined }} className="inline-flex h-12 items-center justify-center rounded-xl bg-background px-6 font-semibold text-foreground"><ClipboardList className="mr-2 h-5 w-5" />Pedir lista por encargo</Link>
+            <Link to="/opinion" className="inline-flex h-12 items-center justify-center rounded-xl border-2 border-background px-6 font-semibold text-background">Danos tu opinión</Link>
           </div>
         </div>
       </section>
