@@ -50,7 +50,7 @@ function Seguimiento() {
       {o && (
         <Card className="space-y-5">
           <div className="flex flex-wrap items-center justify-between gap-2">
-            <div><p className="font-display text-2xl font-bold">{o.code}</p><p className="text-sm text-muted-foreground">{o.business} · {o.service === "taxi_delivery" ? "Taxi de confianza" : "Entrega en tu bodega (van compartida)"} · {o.deliveryDate}</p></div>
+            <div><p className="font-display text-2xl font-bold">{o.code}</p><p className="text-sm text-muted-foreground">{o.business} · {o.service === "taxi_delivery" ? "Entrega tipo 1 · Compra y subida a tu taxi" : "Entrega tipo 2 · Hasta tu bodega o almacén"} · {o.deliveryDate}</p></div>
             <p className="font-bold">{soles(o.total)}</p>
           </div>
           {o.status === "cancelled" ? <p className="rounded-xl bg-destructive/10 p-3 text-destructive">Pedido cancelado</p> : (

@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Clock, MessageCircle, ShieldCheck, ShoppingBag, Store, Truck, ClipboardList, TrendingUp } from "lucide-react";
+import { Clock, MessageCircle, ShoppingBag, ClipboardList, TrendingUp } from "lucide-react";
 import hero from "@/assets/hero.jpg";
 import { CATEGORIES } from "@/lib/data";
 import { useStore } from "@/lib/store";
@@ -38,7 +38,7 @@ function Index() {
         <div className="relative max-w-2xl p-6 py-12 text-background md:p-12 md:py-20">
           <span className="rounded-full bg-primary px-3 py-1 text-xs font-semibold text-primary-foreground">Tu bodega abastecida, sin salir de ella</span>
           <h1 className="mt-4 text-3xl font-extrabold leading-tight md:text-5xl">Abastece tu bodega desde el Mercado Mayorista Unicachi sin moverte de tu negocio</h1>
-          <p className="mt-4 text-background/85 md:text-lg">Compramos tus frutas y verduras en los mejores puestos de Unicachi y te las entregamos en tu taxi de confianza o en van compartida.</p>
+          <p className="mt-4 text-background/85 md:text-lg">Tú eliges productos y caseros. Apruebas cada foto y precio antes de pagar.</p>
           <div className="mt-6 flex flex-col gap-3 sm:flex-row">
             <Link to="/catalogo" className="inline-flex h-12 items-center justify-center rounded-xl bg-primary px-6 font-semibold text-primary-foreground"><ShoppingBag className="mr-2 h-5 w-5" />Explorar catálogo</Link>
             <Link to="/solicitud" search={{ vendor: undefined }} className="inline-flex h-12 items-center justify-center rounded-xl bg-background px-6 font-semibold text-foreground"><ClipboardList className="mr-2 h-5 w-5" />Pedir lista por encargo</Link>

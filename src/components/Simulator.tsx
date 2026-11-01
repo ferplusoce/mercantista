@@ -17,15 +17,15 @@ export function Simulator() {
       </div>
       <div className="grid gap-3">
         <div className="rounded-xl bg-muted p-4">
-          <p className="text-sm font-semibold">Servicio 1 · Compra y subida a tu taxi</p>
+          <p className="text-sm font-semibold">Entrega tipo 1 · Compra y subida a tu taxi</p>
           <p className="font-display text-3xl font-bold">{soles(taxiFee(t))}</p>
           <p className="text-xs text-muted-foreground">Precio fijo por pedido. Incluye compra, foto de cada producto y subida a tu taxi. La carrera la pagas a tu chofer.</p>
         </div>
         <div className="rounded-xl bg-accent p-4">
-          <p className="text-sm font-semibold">Servicio 2 · Entrega en tu bodega (van compartida)</p>
+          <p className="text-sm font-semibold">Entrega tipo 2 · Hasta tu bodega o almacén</p>
           {m.ok ? <>
             <p className="font-display text-3xl font-bold text-accent-foreground">{soles(m.total)}</p>
-            <p className="text-xs">Tramo {m.tramo} · precio total con compra, consolidación y flete.</p>
+            <p className="text-xs">{zone} · compra, consolidación y flete incluidos.</p>
           </> : <p className="mt-1 text-sm text-destructive">Supera el límite de 750 kg por pedido. Divide el pedido o elige taxi.</p>}
         </div>
       </div>
