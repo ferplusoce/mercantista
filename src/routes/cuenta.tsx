@@ -8,6 +8,8 @@ import { Card, Field, inputCls } from "@/components/Field";
 
 export const Route = createFileRoute("/cuenta")({
   head: () => ({ meta: [
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
     { title: "Mi cuenta — Mercantista" },
     { name: "description", content: "Datos de tu bodega, direcciones, taxis de confianza e historial de pedidos." },
     { property: "og:title", content: "Mi cuenta — Mercantista" },

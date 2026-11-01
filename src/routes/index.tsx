@@ -1,14 +1,17 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Clock, MessageCircle, ShieldCheck, ShoppingBag, Store, Truck, ClipboardList, TrendingUp } from "lucide-react";
+import { Clock, MessageCircle, ShoppingBag, ClipboardList, TrendingUp } from "lucide-react";
 import hero from "@/assets/hero.jpg";
 import { CATEGORIES } from "@/lib/data";
 import { useStore } from "@/lib/store";
 import { ProductCard } from "@/components/ProductCard";
 import { VendorCard } from "@/components/VendorCard";
 import { InstallButton } from "@/components/InstallButton";
+import { HowItWorks } from "@/components/HowItWorks";
 
 export const Route = createFileRoute("/")({
   head: () => ({ meta: [
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
     { title: "Mercantista — Abastece tu bodega desde Unicachi" },
     { name: "description", content: "Frutas y verduras del Mercado Mayorista Unicachi entregadas en tu taxi de confianza o en van compartida hasta tu bodega en Lurín." },
     { property: "og:title", content: "Mercantista — Tu bodega abastecida, sin salir de ella" },
@@ -37,7 +40,7 @@ function Index() {
         <div className="relative max-w-2xl p-6 py-12 text-background md:p-12 md:py-20">
           <span className="rounded-full bg-primary px-3 py-1 text-xs font-semibold text-primary-foreground">Tu bodega abastecida, sin salir de ella</span>
           <h1 className="mt-4 text-3xl font-extrabold leading-tight md:text-5xl">Abastece tu bodega desde el Mercado Mayorista Unicachi sin moverte de tu negocio</h1>
-          <p className="mt-4 text-background/85 md:text-lg">Compramos tus frutas y verduras en los mejores puestos de Unicachi y te las entregamos en tu taxi de confianza o en van compartida.</p>
+          <p className="mt-4 text-background/85 md:text-lg">Tú eliges productos y caseros. Apruebas cada foto y precio antes de pagar.</p>
           <div className="mt-6 flex flex-col gap-3 sm:flex-row">
             <Link to="/catalogo" className="inline-flex h-12 items-center justify-center rounded-xl bg-primary px-6 font-semibold text-primary-foreground"><ShoppingBag className="mr-2 h-5 w-5" />Explorar catálogo</Link>
             <Link to="/solicitud" search={{ vendor: undefined }} className="inline-flex h-12 items-center justify-center rounded-xl bg-background px-6 font-semibold text-foreground"><ClipboardList className="mr-2 h-5 w-5" />Pedir lista por encargo</Link>
@@ -46,6 +49,8 @@ function Index() {
           </div>
         </div>
       </section>
+
+      <section><SectionTitle title="¿Cómo funciona?" /><HowItWorks /><div className="mt-6 grid gap-4 md:grid-cols-2"><p className="text-lg"><b>Entrega tipo 1 · Compra y subida a tu taxi</b><br />S/ 50 fijo. Compramos a tus caseros y subimos todo a tu taxi en Unicachi.</p><p className="text-lg"><b>Entrega tipo 2 · Hasta tu bodega o almacén</b><br />Desde S/ 100 según tu zona y el peso. Lo llevamos en van compartida hasta tu local.</p></div></section>
 
       <div className="grid gap-3 md:grid-cols-3">
         {[[TrendingUp, "Precios directos de Unicachi"], [Clock, "Entregas programadas en la mañana"], [MessageCircle, "Atención personalizada por WhatsApp"]].map(([I, t]) => {
@@ -77,16 +82,6 @@ function Index() {
       <section>
         <SectionTitle title="Puestos destacados de Unicachi" link={{ to: "/puestos", label: "Ver todos" }} />
         <div className="grid gap-4 md:grid-cols-3">{vendors.slice(0, 3).map((v) => <VendorCard key={v.id} v={v} />)}</div>
-      </section>
-
-      <section>
-        <SectionTitle title="Cómo funciona" />
-        <div className="grid gap-4 md:grid-cols-4">
-          {[[ShoppingBag, "Eliges tus productos", "Selecciona del catálogo o escribe tu lista personalizada."], [Store, "Compramos en Unicachi", "Nuestro equipo compra directo en los puestos que elegiste."], [Truck, "Eliges tu entrega", "A tu taxi de confianza o en van compartida hasta tu bodega."], [ShieldCheck, "Recibes y verificas", "Mercadería fresca lista para la venta del día."]].map(([I, t, d], i) => {
-            const Icon = I as typeof Store;
-            return <div key={i} className="rounded-2xl border bg-card p-5 shadow-sm"><div className="flex items-center gap-3"><span className="grid h-9 w-9 place-items-center rounded-full bg-primary font-bold text-primary-foreground">{i + 1}</span><Icon className="h-5 w-5 text-primary" /></div><p className="mt-3 font-semibold">{t as string}</p><p className="text-sm text-muted-foreground">{d as string}</p></div>;
-          })}
-        </div>
       </section>
 
       <section className="flex flex-col items-start justify-between gap-4 rounded-3xl bg-primary p-8 text-primary-foreground md:flex-row md:items-center">

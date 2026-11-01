@@ -10,6 +10,8 @@ type S = { q?: string; cat?: Category; vendor?: string };
 export const Route = createFileRoute("/catalogo")({
   validateSearch: (s: Record<string, unknown>): S => ({ q: s.q as string | undefined, cat: s.cat as Category | undefined, vendor: s.vendor as string | undefined }),
   head: () => ({ meta: [
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
     { title: "Catálogo mayorista de frutas y verduras — Mercantista" },
     { name: "description", content: "Papas, cebollas, tomates, cítricos y frutas por saco, jaba y malla desde los puestos de Unicachi." },
     { property: "og:title", content: "Catálogo mayorista — Mercantista" },

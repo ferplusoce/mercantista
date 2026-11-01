@@ -1,7 +1,15 @@
 import { supabase } from "@/integrations/supabase/client";
 
 export const OP_ZONES = ["Lurín", "Pachacámac", "Villa El Salvador", "Entrada de Unicachi", "Otra"];
-export const OP_SERVICES = { taxi: "Taxi S/ 50", tramo1: "Tramo 1", tramo2: "Tramo 2" } as const;
+export const OP_SERVICES = { tipo1: "Tipo 1 · En mi taxi (S/ 50)", tipo2: "Tipo 2 · Hasta mi bodega o almacén (desde S/ 100)" } as const;
+export function deliveryType(value: string | null): keyof typeof OP_SERVICES | null {
+  if (value === "tipo1" || value === "taxi") return "tipo1";
+  if (value === "tipo2" || value === "tramo1" || value === "tramo2") return "tipo2";
+  return null;
+}
+export function deliveryBreakdown(list: Opinion[]): [string, number][] {
+  return Object.entries(OP_SERVICES).map(([key, label]) => [label, list.filter((o) => deliveryType(o.servicio_preferido) === key).length]);
+}
 export const OP_USARIA = { si: "Sí", tal_vez: "Tal vez", no: "No" } as const;
 export const GOAL = 120;
 
@@ -49,8 +57,8 @@ export function computeStats(list: Opinion[]) {
   return {
     n,
     sinAyuda: pct(list.filter((o) => o.armo_sin_ayuda).length),
-    menos5: pct(timed.filter((o) => o.tiempo_segundos! < 300).length, timed.length),
-    satisfaccion: sat.length ? Math.round((sat.reduce((s, o) => s + o.satisfaccion!, 0) / sat.length) * 10) / 10 : 0,
+    menos5: pct(timed.filter((o) => o.tiempo_segundos != null && o.tiempo_segundos < 300).length, timed.length),
+    satisfaccion: sat.length ? Math.round((sat.reduce((s, o) => s + (o.satisfaccion ?? 0), 0) / sat.length) * 10) / 10 : 0,
     usariaWa: pct(list.filter((o) => o.lo_usaria === "si" && o.whatsapp?.trim()).length),
   };
 }
@@ -58,5 +66,5 @@ export function computeStats(list: Opinion[]) {
 export function toCSV(list: Opinion[]) {
   const cols: (keyof Opinion)[] = ["created_at", "zona", "armo_sin_ayuda", "tiempo_segundos", "satisfaccion", "lo_usaria", "servicio_preferido", "precio_justo", "comentario", "whatsapp", "codigo_encuestador", "order_code"];
   const esc = (v: unknown) => { const s = v == null ? "" : String(v); return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s; };
-  return [cols.join(","), ...list.map((o) => cols.map((c) => esc(o[c])).join(","))].join("\n");
+  return [cols.join(",") + ",tipo_entrega", ...list.map((o) => [...cols.map((c) => esc(o[c])), esc(deliveryType(o.servicio_preferido))].join(",")), "", "Por tipo de entrega,Opiniones", ...deliveryBreakdown(list).map(([label, count]) => `${esc(label)},${count}`)].join("\n");
 }

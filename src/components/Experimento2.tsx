@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { Download } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { GOAL, OP_SERVICES, OP_ZONES, computeStats, toCSV, type Opinion } from "@/lib/opinions";
+import { GOAL, OP_ZONES, computeStats, deliveryBreakdown, toCSV, type Opinion } from "@/lib/opinions";
 import { Card } from "@/components/Field";
 
 function Kpi({ l, v, ok, meta }: { l: string; v: string; ok: boolean; meta: string }) {
@@ -49,7 +49,7 @@ export function Experimento2() {
       </div>
       <div className="grid gap-4 md:grid-cols-2">
         <Breakdown title="Por zona" rows={OP_ZONES.map((z) => [z, list.filter((o) => o.zona === z).length])} />
-        <Breakdown title="Por servicio preferido" rows={Object.entries(OP_SERVICES).map(([k, l]) => [l, list.filter((o) => o.servicio_preferido === k).length])} />
+        <Breakdown title="Por tipo de entrega" rows={deliveryBreakdown(list)} />
       </div>
       {q.isLoading && <p className="text-center text-muted-foreground">Cargando...</p>}
     </div>

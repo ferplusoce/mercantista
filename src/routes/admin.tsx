@@ -14,9 +14,12 @@ import { AdminPhotos } from "@/components/PhotoApproval";
 import { useServerFn } from "@tanstack/react-start";
 import { loginWithAdminKey } from "@/lib/admin-key.functions";
 import { Experimento2 } from "@/components/Experimento2";
+import { AdminRequests } from "@/components/AdminRequests";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({ meta: [
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
     { title: "Panel de operaciones — Mercantista" },
     { name: "description", content: "Gestión de puestos, precios diarios, pedidos, tarifas y costos operativos." },
     { property: "og:title", content: "Panel de operaciones — Mercantista" },
@@ -63,6 +66,7 @@ function Admin() {
         <TabsList className="h-auto flex-wrap">
           {["resumen", "pedidos", "productos", "puestos", "tarifas", "reportes"].map((t) => <TabsTrigger key={t} value={t} className="capitalize">{t}</TabsTrigger>)}
           <TabsTrigger value="exp2">Experimento 2</TabsTrigger>
+          <TabsTrigger value="solicitudes">Solicitudes</TabsTrigger>
         </TabsList>
         <TabsContent value="resumen"><Resumen /></TabsContent>
         <TabsContent value="pedidos"><Pedidos /></TabsContent>
@@ -71,6 +75,7 @@ function Admin() {
         <TabsContent value="tarifas"><Tarifas /></TabsContent>
         <TabsContent value="reportes"><Reportes /></TabsContent>
         <TabsContent value="exp2"><Experimento2 /></TabsContent>
+        <TabsContent value="solicitudes"><AdminRequests /></TabsContent>
       </Tabs>
     </div>
   );
@@ -95,8 +100,8 @@ function Resumen() {
       <div className="grid gap-4 md:grid-cols-2">
         <Card><p className="mb-2 font-semibold">Pedidos por estado</p><ResponsiveContainer width="100%" height={220}><BarChart data={byStatus}><CartesianGrid strokeDasharray="3 3" stroke="var(--border)" /><XAxis dataKey="name" fontSize={11} /><YAxis allowDecimals={false} /><Tooltip /><Bar dataKey="pedidos" fill="var(--primary)" radius={6} /></BarChart></ResponsiveContainer></Card>
         <Card>
-          <p className="mb-2 font-semibold">Por servicio</p>
-          {(["taxi_delivery", "minivan_delivery"] as const).map((s) => <div key={s} className="flex justify-between border-b py-2 text-sm"><span>{s === "taxi_delivery" ? "Servicio 1 · Taxi" : "Servicio 2 · Van compartida"}</span><b>{orders.filter((o) => o.service === s).length} pedidos</b></div>)}
+          <p className="mb-2 font-semibold">Por tipo de entrega</p>
+          {(["taxi_delivery", "minivan_delivery"] as const).map((s) => <div key={s} className="flex justify-between border-b py-2 text-sm"><span>{s === "taxi_delivery" ? "Entrega tipo 1 · Compra y subida a tu taxi" : "Entrega tipo 2 · Hasta tu bodega o almacén"}</span><b>{orders.filter((o) => o.service === s).length} pedidos</b></div>)}
           <p className="mb-2 mt-4 font-semibold">Puestos a visitar hoy</p>
           {visit.map(({ v, items }) => <div key={v.id} className="flex justify-between py-1 text-sm"><span>{v.stall} · {v.name}</span><b>{items.reduce((s, i) => s + i.qty, 0)} bultos</b></div>)}
         </Card>
@@ -120,16 +125,16 @@ function Pedidos() {
     <Card className="space-y-3">
       <div className="grid gap-2 md:grid-cols-3">
         <select className={inputCls} value={st} onChange={(e) => setSt(e.target.value)}><option value="">Todos los estados</option>{[...STATUS_FLOW, "cancelled" as const].map((s) => <option key={s} value={s}>{STATUS_LABEL[s]}</option>)}</select>
-        <select className={inputCls} value={sv} onChange={(e) => setSv(e.target.value)}><option value="">Todo servicio</option><option value="taxi_delivery">Taxi</option><option value="minivan_delivery">Van compartida</option></select>
+        <select className={inputCls} value={sv} onChange={(e) => setSv(e.target.value)}><option value="">Todas las entregas</option><option value="taxi_delivery">Entrega tipo 1 · Compra y subida a tu taxi</option><option value="minivan_delivery">Entrega tipo 2 · Hasta tu bodega o almacén</option></select>
         <input type="date" className={inputCls} value={date} onChange={(e) => setDate(e.target.value)} />
       </div>
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
-          <thead className="text-left text-muted-foreground"><tr><th className="p-2">Código</th><th className="p-2">Bodega</th><th className="p-2">Servicio</th><th className="p-2">Total</th><th className="p-2">Estado</th></tr></thead>
+          <thead className="text-left text-muted-foreground"><tr><th className="p-2">Código</th><th className="p-2">Bodega</th><th className="p-2">Entrega</th><th className="p-2">Total</th><th className="p-2">Estado</th></tr></thead>
           <tbody>{list.map((o) => (
             <tr key={o.code} className="border-t">
               <td className="p-2"><button className="font-semibold text-primary" onClick={() => setOpen(o)}>{o.code}</button></td>
-              <td className="p-2">{o.business}</td><td className="p-2">{o.service === "taxi_delivery" ? "🚕 Taxi" : "🚐 Van compartida"}</td><td className="p-2 tabular-nums">{soles(o.total)}</td>
+              <td className="p-2">{o.business}</td><td className="p-2">{o.service === "taxi_delivery" ? "Entrega tipo 1 · Compra y subida a tu taxi" : "Entrega tipo 2 · Hasta tu bodega o almacén"}</td><td className="p-2 tabular-nums">{soles(o.total)}</td>
               <td className="p-2"><select className="h-9 rounded-lg border bg-card px-2" value={o.status} onChange={(e) => { const ns = e.target.value as OrderStatus; m.setStatus(o, ns).then(() => toast.success(`${o.code}: ${STATUS_LABEL[ns]}`), () => toast.error("No se pudo cambiar el estado")); }}>{[...STATUS_FLOW, "cancelled" as const].map((s) => <option key={s} value={s}>{STATUS_LABEL[s]}</option>)}</select></td>
             </tr>
           ))}</tbody>
@@ -226,11 +231,11 @@ function Tarifas() {
   return (
     <div className="space-y-4">
       <Card className="grid gap-3 md:grid-cols-3">
-        <label className="text-sm"><span className="text-muted-foreground">Taxi: precio fijo por pedido S/</span><input type="number" className={inputCls} value={t.taxiFlat} onChange={(e) => set({ taxiFlat: +e.target.value })} /></label>
+        <label className="text-sm"><span className="text-muted-foreground">Entrega tipo 1 · Compra y subida a tu taxi: fijo por pedido S/</span><input type="number" className={inputCls} value={t.taxiFlat} onChange={(e) => set({ taxiFlat: +e.target.value })} /></label>
       </Card>
       <Card className="overflow-x-auto">
-        <table className="w-full text-sm"><thead className="text-left text-muted-foreground"><tr><th className="p-2">Van compartida</th><th className="p-2">Hasta 200 kg</th><th className="p-2">Hasta 450 kg</th><th className="p-2">Hasta 750 kg</th></tr></thead>
-          <tbody>{([1, 2] as const).map((n) => <tr key={n} className="border-t"><td className="p-2">Tramo {n}<p className="text-xs text-muted-foreground">{ZONES.filter((z) => t.zoneTramo[z] === n).join(", ")}</p></td>{t.tramos[n].map((p, i) => <td key={i} className="p-2"><input type="number" step="0.5" className="h-9 w-24 rounded-lg border bg-card px-2" value={p} onChange={(e) => { const arr = [...t.tramos[n]] as [number, number, number]; arr[i] = +e.target.value; set({ tramos: { ...t.tramos, [n]: arr } }); }} /></td>)}</tr>)}</tbody>
+        <table className="w-full text-sm"><thead className="text-left text-muted-foreground"><tr><th className="p-2">Entrega tipo 2 · Hasta tu bodega o almacén</th><th className="p-2">Hasta 200 kg</th><th className="p-2">Hasta 450 kg</th><th className="p-2">Hasta 750 kg</th></tr></thead>
+          <tbody>{([1, 2] as const).map((n) => <tr key={n} className="border-t"><td className="p-2"><p className="text-xs text-muted-foreground">{ZONES.filter((z) => t.zoneTramo[z] === n).join(", ")}</p></td>{t.tramos[n].map((p, i) => <td key={i} className="p-2"><input type="number" step="0.5" className="h-9 w-24 rounded-lg border bg-card px-2" value={p} onChange={(e) => { const arr = [...t.tramos[n]] as [number, number, number]; arr[i] = +e.target.value; set({ tramos: { ...t.tramos, [n]: arr } }); }} /></td>)}</tr>)}</tbody>
         </table>
       </Card>
     </div>

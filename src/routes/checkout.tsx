@@ -12,6 +12,8 @@ import { Card, Field, inputCls, requireFields } from "@/components/Field";
 
 export const Route = createFileRoute("/checkout")({
   head: () => ({ meta: [
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
     { title: "Cotización y confirmación — Mercantista" },
     { name: "description", content: "Elige taxi o entrega en tu bodega, método de pago y confirma tu pedido." },
     { property: "og:title", content: "Confirma tu pedido — Mercantista" },
@@ -75,9 +77,9 @@ function Checkout() {
   return (
     <div className="grid gap-6 lg:grid-cols-3">
       <div className="space-y-5 lg:col-span-2">
-        <h1 className="text-3xl font-bold">Elige tu servicio y confirma</h1>
+        <h1 className="text-3xl font-bold">Elige tu entrega y confirma</h1>
         <div className="grid gap-3 md:grid-cols-2">
-          {([["taxi_delivery", Car, "Compra y subida a tu taxi", `${soles(taxiFee(t))} fijo por pedido`], ["minivan_delivery", Truck, "Entrega en tu bodega (van compartida)", mv.ok ? `Tramo ${mv.tramo} · ${soles(mv.total)}` : "No disponible (> 750 kg)"]] as const).map(([id, Icon, title, price]) => (
+          {([["taxi_delivery", Car, "Entrega tipo 1 · Compra y subida a tu taxi", `${soles(taxiFee(t))} fijo por pedido`], ["minivan_delivery", Truck, "Entrega tipo 2 · Hasta tu bodega o almacén", mv.ok ? `${f.zone} · ${soles(mv.total)}` : "No disponible (> 750 kg)"]] as const).map(([id, Icon, title, price]) => (
             <button key={id} onClick={() => setService(id)} className={`rounded-2xl border-2 bg-card p-5 text-left shadow-sm ${service === id ? "border-primary" : "border-transparent"}`}>
               <Icon className="h-7 w-7 text-primary" /><p className="mt-2 font-bold">{title}</p><p className="text-sm text-muted-foreground">{price}</p>
             </button>
@@ -107,7 +109,7 @@ function Checkout() {
           </Card>
         ) : (
           <Card className="grid gap-3 md:grid-cols-2">
-            <h2 className="font-bold md:col-span-2">Entrega en tu bodega</h2>
+            <h2 className="font-bold md:col-span-2">Entrega tipo 2 · Hasta tu bodega o almacén</h2>
             <Field label="Zona" required><select className={inputCls} value={f.zone} onChange={set("zone")}>{ZONES.map((z) => <option key={z}>{z}</option>)}</select></Field>
             <Field label="Turno" required><select className={inputCls} value={f.slot} onChange={set("slot")}>{SLOTS.map((z) => <option key={z}>{z}</option>)}</select></Field>
             <div className="md:col-span-2"><Field label="Dirección y referencia" required error={err.address}><input className={inputCls} value={f.address} onChange={set("address")} placeholder="Av. ..., frente a ..." /></Field></div>
@@ -130,7 +132,7 @@ function Checkout() {
         <p className="text-xs text-muted-foreground">{sum.weightKg} kg · {sum.packages} bultos · {sum.vendors} puestos</p>
         <div className="space-y-1 border-t pt-3 text-sm">
           <div className="flex justify-between"><span>Productos en Unicachi</span><span className="tabular-nums">{soles(sum.subtotal)}</span></div>
-          <div className="flex justify-between"><span>{service === "taxi_delivery" ? "Compra y subida a tu taxi" : `Entrega en tu bodega · Tramo ${mv.tramo ?? "-"} (${f.zone})`}</span><span className="tabular-nums">{soles(serviceFee)}</span></div>
+          <div className="flex justify-between gap-3"><span>{service === "taxi_delivery" ? "Entrega tipo 1 · Compra y subida a tu taxi" : `Entrega tipo 2 · Hasta tu bodega o almacén (${f.zone})`}</span><span className="tabular-nums">{soles(serviceFee)}</span></div>
           
         </div>
         <div className="flex justify-between border-t pt-3 text-lg font-bold"><span>Total estimado</span><span className="tabular-nums">{soles(total)}</span></div>
@@ -148,7 +150,7 @@ function Success({ o }: { o: Order }) {
       <h1 className="mt-3 text-2xl font-bold">¡Pedido confirmado!</h1>
       <p className="text-muted-foreground">Tu código de seguimiento</p>
       <p className="font-display text-4xl font-extrabold text-primary">{o.code}</p>
-      <p className="mt-2 text-sm">Total estimado <b>{soles(o.total)}</b> · {o.service === "taxi_delivery" ? "Taxi de confianza" : "Entrega en tu bodega (van compartida)"}</p>
+      <p className="mt-2 text-sm">Total estimado <b>{soles(o.total)}</b> · {o.service === "taxi_delivery" ? "Entrega tipo 1 · Compra y subida a tu taxi" : "Entrega tipo 2 · Hasta tu bodega o almacén"}</p>
       <div className="mt-5 grid gap-2">
         <Link to="/seguimiento" search={{ code: o.code }} className="flex h-12 items-center justify-center rounded-xl bg-primary font-semibold text-primary-foreground">Seguir mi pedido</Link>
         <a href={waLink(text)} target="_blank" rel="noreferrer" className="flex h-12 items-center justify-center rounded-xl bg-success font-semibold text-success-foreground"><MessageCircle className="mr-2 h-5 w-5" />Compartir por WhatsApp</a>

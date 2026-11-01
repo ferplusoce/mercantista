@@ -10,6 +10,8 @@ import { ClientPhotos } from "@/components/PhotoApproval";
 export const Route = createFileRoute("/seguimiento")({
   validateSearch: (s: Record<string, unknown>) => ({ code: s.code as string | undefined }),
   head: () => ({ meta: [
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
     { title: "Seguimiento de pedido — Mercantista" },
     { name: "description", content: "Consulta el estado de tu pedido con tu código MCT." },
     { property: "og:title", content: "Seguimiento de pedido — Mercantista" },
@@ -50,7 +52,7 @@ function Seguimiento() {
       {o && (
         <Card className="space-y-5">
           <div className="flex flex-wrap items-center justify-between gap-2">
-            <div><p className="font-display text-2xl font-bold">{o.code}</p><p className="text-sm text-muted-foreground">{o.business} · {o.service === "taxi_delivery" ? "Taxi de confianza" : "Entrega en tu bodega (van compartida)"} · {o.deliveryDate}</p></div>
+            <div><p className="font-display text-2xl font-bold">{o.code}</p><p className="text-sm text-muted-foreground">{o.business} · {o.service === "taxi_delivery" ? "Entrega tipo 1 · Compra y subida a tu taxi" : "Entrega tipo 2 · Hasta tu bodega o almacén"} · {o.deliveryDate}</p></div>
             <p className="font-bold">{soles(o.total)}</p>
           </div>
           {o.status === "cancelled" ? <p className="rounded-xl bg-destructive/10 p-3 text-destructive">Pedido cancelado</p> : (

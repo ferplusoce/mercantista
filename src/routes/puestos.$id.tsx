@@ -7,6 +7,8 @@ import { PriceNote, ProductCard } from "@/components/ProductCard";
 export const Route = createFileRoute("/puestos/$id")({
   loader: ({ params }) => { const v = VENDORS.find((x) => x.id === params.id); if (!v) throw notFound(); return { name: v.name, stall: v.stall }; },
   head: ({ loaderData }) => ({ meta: [
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
     { title: loaderData ? `${loaderData.name} - Puesto ${loaderData.stall} — Mercantista` : "Puesto no disponible" },
     { name: "description", content: "Productos mayoristas de este puesto de Unicachi." },
     { property: "og:title", content: loaderData ? `${loaderData.name} en Unicachi` : "Puesto" },
