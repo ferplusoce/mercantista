@@ -14,6 +14,7 @@ import { AdminPhotos } from "@/components/PhotoApproval";
 import { useServerFn } from "@tanstack/react-start";
 import { loginWithAdminKey } from "@/lib/admin-key.functions";
 import { Experimento2 } from "@/components/Experimento2";
+import { AdminRequests } from "@/components/AdminRequests";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({ meta: [
@@ -63,6 +64,7 @@ function Admin() {
         <TabsList className="h-auto flex-wrap">
           {["resumen", "pedidos", "productos", "puestos", "tarifas", "reportes"].map((t) => <TabsTrigger key={t} value={t} className="capitalize">{t}</TabsTrigger>)}
           <TabsTrigger value="exp2">Experimento 2</TabsTrigger>
+          <TabsTrigger value="solicitudes">Solicitudes</TabsTrigger>
         </TabsList>
         <TabsContent value="resumen"><Resumen /></TabsContent>
         <TabsContent value="pedidos"><Pedidos /></TabsContent>
@@ -71,6 +73,7 @@ function Admin() {
         <TabsContent value="tarifas"><Tarifas /></TabsContent>
         <TabsContent value="reportes"><Reportes /></TabsContent>
         <TabsContent value="exp2"><Experimento2 /></TabsContent>
+        <TabsContent value="solicitudes"><AdminRequests /></TabsContent>
       </Tabs>
     </div>
   );

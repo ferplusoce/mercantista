@@ -6,6 +6,7 @@ import { useStore } from "@/lib/store";
 import { ProductCard } from "@/components/ProductCard";
 import { VendorCard } from "@/components/VendorCard";
 import { InstallButton } from "@/components/InstallButton";
+import { HowItWorks } from "@/components/HowItWorks";
 
 export const Route = createFileRoute("/")({
   head: () => ({ meta: [
@@ -47,6 +48,8 @@ function Index() {
         </div>
       </section>
 
+      <section><SectionTitle title="¿Cómo funciona?" /><HowItWorks /></section>
+
       <div className="grid gap-3 md:grid-cols-3">
         {[[TrendingUp, "Precios directos de Unicachi"], [Clock, "Entregas programadas en la mañana"], [MessageCircle, "Atención personalizada por WhatsApp"]].map(([I, t]) => {
           const Icon = I as typeof Clock;
@@ -77,16 +80,6 @@ function Index() {
       <section>
         <SectionTitle title="Puestos destacados de Unicachi" link={{ to: "/puestos", label: "Ver todos" }} />
         <div className="grid gap-4 md:grid-cols-3">{vendors.slice(0, 3).map((v) => <VendorCard key={v.id} v={v} />)}</div>
-      </section>
-
-      <section>
-        <SectionTitle title="Cómo funciona" />
-        <div className="grid gap-4 md:grid-cols-4">
-          {[[ShoppingBag, "Eliges tus productos", "Selecciona del catálogo o escribe tu lista personalizada."], [Store, "Compramos en Unicachi", "Nuestro equipo compra directo en los puestos que elegiste."], [Truck, "Eliges tu entrega", "A tu taxi de confianza o en van compartida hasta tu bodega."], [ShieldCheck, "Recibes y verificas", "Mercadería fresca lista para la venta del día."]].map(([I, t, d], i) => {
-            const Icon = I as typeof Store;
-            return <div key={i} className="rounded-2xl border bg-card p-5 shadow-sm"><div className="flex items-center gap-3"><span className="grid h-9 w-9 place-items-center rounded-full bg-primary font-bold text-primary-foreground">{i + 1}</span><Icon className="h-5 w-5 text-primary" /></div><p className="mt-3 font-semibold">{t as string}</p><p className="text-sm text-muted-foreground">{d as string}</p></div>;
-          })}
-        </div>
       </section>
 
       <section className="flex flex-col items-start justify-between gap-4 rounded-3xl bg-primary p-8 text-primary-foreground md:flex-row md:items-center">

@@ -3,7 +3,9 @@ import { useState } from "react";
 import { CheckCircle2, ImageUp, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { ZONES, waLink } from "@/lib/data";
-import { getState, nextCode, setState, useStore, type CustomRequest } from "@/lib/store";
+import { useStore, type CustomRequest } from "@/lib/store";
+import { submitRequest } from "@/lib/requests";
+import { Button } from "@/components/ui/button";
 import { Card, Field, inputCls, requireFields } from "@/components/Field";
 
 export const Route = createFileRoute("/solicitud")({
@@ -25,25 +27,27 @@ function Solicitud() {
   const vendors = useStore((s) => s.vendors);
   const [mode, setMode] = useState<"lista" | "foto">("lista");
   const [rows, setRows] = useState<Row[]>([empty(vendor)]);
-  const [file, setFile] = useState<{ name: string; url?: string } | null>(null);
+  const [file, setFile] = useState<{ name: string; url?: string; raw: File } | null>(null);
+  const [sending, setSending] = useState(false);
   const [f, setF] = useState({ business: "", contact: "", phone: "", address: "", zone: ZONES[0] as string, date: "" });
   const [err, setErr] = useState<Record<string, string>>({});
   const [done, setDone] = useState<string | null>(null);
   const upd = (i: number, k: keyof Row, v: string) => setRows((r) => r.map((x, j) => (j === i ? { ...x, [k]: v } : x)));
 
-  const submit = () => {
+  const submit = async () => {
+    if (sending) return;
     const e = requireFields(f, ["business", "contact", "phone", "address", "date"]);
     const items = rows.filter((r) => r.name.trim());
     if (mode === "lista" && items.length === 0) e.items = "Agrega al menos un producto";
     if (mode === "foto" && !file) e.items = "Adjunta la foto o archivo de tu lista";
     setErr(e);
     if (Object.keys(e).length) { toast.error("Revisa los campos marcados"); return; }
-    const code = nextCode("SOL");
-    const req: CustomRequest = { code, createdAt: new Date().toISOString(), business: f.business, contact: f.contact, phone: f.phone, address: `${f.address}, ${f.zone}`, date: f.date, items, attachment: file?.name, status: "pending" };
-    setState((s) => ({ requests: [req, ...s.requests] }));
-    void getState;
-    toast.success("Solicitud enviada");
-    setDone(code);
+    setSending(true);
+    try {
+      const code = await submitRequest({ business: f.business, contact: f.contact, phone: f.phone, address: f.address, zone: f.zone, delivery_date: f.date, items: mode === "lista" ? items : [] }, mode === "foto" ? file?.raw : undefined);
+      toast.success("Solicitud enviada"); setDone(code);
+    } catch (error) { toast.error(error instanceof Error && error.name !== "ZodError" ? error.message : "Revisa los datos: celular de 9 dígitos y cantidades mayores a cero"); }
+    finally { setSending(false); }
   };
 
   if (done) return (
@@ -51,7 +55,7 @@ function Solicitud() {
       <CheckCircle2 className="mx-auto h-14 w-14 text-success" />
       <h1 className="mt-3 text-2xl font-bold">¡Solicitud recibida, casero!</h1>
       <p className="mt-1 text-muted-foreground">Tu número de confirmación es</p>
-      <p className="font-display text-3xl font-extrabold text-primary">{done}</p>
+      <p className="break-all font-display text-2xl font-extrabold text-primary">{done}</p>
       <p className="mt-2 text-sm text-muted-foreground">Cotizamos en Unicachi y te escribimos por WhatsApp antes de las 05:00 am.</p>
       <a href={waLink(`Hola Mercantista, envié la solicitud ${done}`)} target="_blank" rel="noreferrer" className="mt-5 inline-flex h-12 items-center rounded-xl bg-success px-6 font-semibold text-success-foreground">Escribir por WhatsApp</a>
     </Card>
@@ -84,7 +88,7 @@ function Solicitud() {
             <ImageUp className="h-10 w-10 text-primary" />
             <span className="font-semibold">Toca para subir la foto de tu lista</span>
             <span className="text-xs text-muted-foreground">Imagen, PDF o archivo de texto</span>
-            <input type="file" accept="image/*,.pdf,.txt,.doc,.docx" className="hidden" onChange={(e) => { const x = e.target.files?.[0]; if (x) setFile({ name: x.name, url: x.type.startsWith("image/") ? URL.createObjectURL(x) : undefined }); }} />
+            <input type="file" accept="image/*,.pdf,.txt,.doc,.docx" className="hidden" onChange={(e) => { const x = e.target.files?.[0]; if (x) { if (file?.url) URL.revokeObjectURL(file.url); setFile({ raw: x, name: x.name, url: x.type.startsWith("image/") ? URL.createObjectURL(x) : undefined }); } }} />
           </label>
           {file && <div className="mt-3 rounded-xl bg-muted p-3 text-sm">{file.url && <img src={file.url} alt="Vista previa de la lista" className="mb-2 max-h-64 rounded-lg" />}📎 {file.name}</div>}
         </Card>
@@ -98,7 +102,7 @@ function Solicitud() {
         <Field label="Dirección del negocio" required error={err.address}><input className={inputCls} value={f.address} onChange={(e) => setF({ ...f, address: e.target.value })} /></Field>
         <Field label="Fecha y hora deseada de recepción" required error={err.date}><input type="datetime-local" className={inputCls} value={f.date} onChange={(e) => setF({ ...f, date: e.target.value })} /></Field>
       </Card>
-      <button onClick={submit} className="h-14 w-full rounded-xl bg-primary text-lg font-semibold text-primary-foreground">Enviar solicitud de cotización</button>
+      <Button onClick={submit} disabled={sending} className="h-14 w-full whitespace-normal rounded-xl text-lg font-semibold">{sending ? "Enviando..." : "Enviar solicitud de cotización"}</Button>
     </div>
   );
 }
