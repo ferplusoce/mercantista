@@ -50,7 +50,6 @@ export function Header() {
       </div>
       <div className="mx-auto flex max-w-7xl items-center gap-4 px-4 py-3">
         <Logo />
-        <Welcome />
         <div className="hidden flex-1 md:block"><SearchBox /></div>
         <Link to="/solicitud" search={{ vendor: undefined }} className="hidden rounded-xl border bg-card px-3 py-2 text-sm font-medium hover:bg-muted lg:inline-flex"><ClipboardList className="mr-1.5 h-4 w-4" />Solicitud personalizada</Link>
         <Link to="/cuenta" className="ml-auto hidden rounded-xl p-2 hover:bg-muted md:block md:ml-0" aria-label="Mi cuenta"><User className="h-5 w-5" /></Link>
@@ -60,8 +59,9 @@ export function Header() {
         </Link>
       </div>
       <div className="px-4 pb-3 md:hidden"><SearchBox /></div>
-      <nav className="mx-auto hidden max-w-7xl gap-1 px-4 pb-2 md:flex">
-        {links.map(([to, l]) => <Link key={to} to={to} className="rounded-lg px-3 py-1.5 text-sm text-muted-foreground hover:bg-muted [&.active]:bg-accent [&.active]:text-accent-foreground">{l}</Link>)}
+      <nav className="mx-auto flex max-w-7xl flex-wrap items-center gap-1 px-4 pb-2">
+        {links.map(([to, l]) => <Link key={to} to={to} className="hidden rounded-lg px-3 py-1.5 text-sm text-muted-foreground hover:bg-muted md:block [&.active]:bg-accent [&.active]:text-accent-foreground">{l}</Link>)}
+        <Welcome />
       </nav>
     </header>
   );
