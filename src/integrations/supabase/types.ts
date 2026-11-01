@@ -207,6 +207,54 @@ export type Database = {
         }
         Relationships: []
       }
+      requests: {
+        Row: {
+          address: string
+          attachment_name: string | null
+          attachment_path: string | null
+          business: string
+          code: string
+          contact: string
+          created_at: string
+          delivery_date: string
+          id: string
+          items: Json
+          phone: string
+          status: string
+          zone: string
+        }
+        Insert: {
+          address: string
+          attachment_name?: string | null
+          attachment_path?: string | null
+          business: string
+          code: string
+          contact: string
+          created_at?: string
+          delivery_date: string
+          id?: string
+          items?: Json
+          phone: string
+          status?: string
+          zone: string
+        }
+        Update: {
+          address?: string
+          attachment_name?: string | null
+          attachment_path?: string | null
+          business?: string
+          code?: string
+          contact?: string
+          created_at?: string
+          delivery_date?: string
+          id?: string
+          items?: Json
+          phone?: string
+          status?: string
+          zone?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           id: string
