@@ -11,6 +11,8 @@ import { Card, Field, inputCls, requireFields } from "@/components/Field";
 export const Route = createFileRoute("/solicitud")({
   validateSearch: (s: Record<string, unknown>) => ({ vendor: s.vendor as string | undefined }),
   head: () => ({ meta: [
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
     { title: "Solicitud personalizada — Mercantista" },
     { name: "description", content: "Envía tu lista de compras y la cotizamos en Unicachi por ti." },
     { property: "og:title", content: "Cotiza tu lista en Unicachi — Mercantista" },

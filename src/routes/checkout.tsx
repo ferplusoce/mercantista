@@ -12,6 +12,8 @@ import { Card, Field, inputCls, requireFields } from "@/components/Field";
 
 export const Route = createFileRoute("/checkout")({
   head: () => ({ meta: [
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
     { title: "Cotización y confirmación — Mercantista" },
     { name: "description", content: "Elige taxi o entrega en tu bodega, método de pago y confirma tu pedido." },
     { property: "og:title", content: "Confirma tu pedido — Mercantista" },

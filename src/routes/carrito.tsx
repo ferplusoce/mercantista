@@ -6,6 +6,8 @@ import { QtyPicker, PriceNote } from "@/components/ProductCard";
 
 export const Route = createFileRoute("/carrito")({
   head: () => ({ meta: [
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
     { title: "Tu pedido — Mercantista" },
     { name: "description", content: "Revisa tu pedido agrupado por puesto de Unicachi." },
     { property: "og:title", content: "Tu pedido — Mercantista" },
@@ -62,7 +64,7 @@ function Carrito() {
         <div className="flex justify-between border-t pt-3"><span>Subtotal productos Unicachi</span><b className="tabular-nums">{soles(sum.subtotal)}</b></div>
         <p className="text-xs text-muted-foreground">El costo del servicio de compra y entrega se define en el siguiente paso.</p>
         <PriceNote />
-        <Link to="/checkout" className="flex h-12 items-center justify-center rounded-xl bg-primary font-semibold text-primary-foreground">Elegir servicio de entrega</Link>
+        <Link to="/checkout" className="flex h-12 items-center justify-center rounded-xl bg-primary font-semibold text-primary-foreground">Elegir tipo de entrega</Link>
       </aside>
     </div>
   );

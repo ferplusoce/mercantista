@@ -5,6 +5,8 @@ import { VendorCard } from "@/components/VendorCard";
 
 export const Route = createFileRoute("/puestos/")({
   head: () => ({ meta: [
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
     { title: "Puestos de Unicachi — Mercantista" },
     { name: "description", content: "Directorio de puestos y vendedores mayoristas del Mercado Unicachi." },
     { property: "og:title", content: "Puestos de Unicachi — Mercantista" },

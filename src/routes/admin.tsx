@@ -18,6 +18,8 @@ import { AdminRequests } from "@/components/AdminRequests";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({ meta: [
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
     { title: "Panel de operaciones — Mercantista" },
     { name: "description", content: "Gestión de puestos, precios diarios, pedidos, tarifas y costos operativos." },
     { property: "og:title", content: "Panel de operaciones — Mercantista" },

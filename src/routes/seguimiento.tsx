@@ -10,6 +10,8 @@ import { ClientPhotos } from "@/components/PhotoApproval";
 export const Route = createFileRoute("/seguimiento")({
   validateSearch: (s: Record<string, unknown>) => ({ code: s.code as string | undefined }),
   head: () => ({ meta: [
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
     { title: "Seguimiento de pedido — Mercantista" },
     { name: "description", content: "Consulta el estado de tu pedido con tu código MCT." },
     { property: "og:title", content: "Seguimiento de pedido — Mercantista" },

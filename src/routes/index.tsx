@@ -10,6 +10,8 @@ import { HowItWorks } from "@/components/HowItWorks";
 
 export const Route = createFileRoute("/")({
   head: () => ({ meta: [
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
     { title: "Mercantista — Abastece tu bodega desde Unicachi" },
     { name: "description", content: "Frutas y verduras del Mercado Mayorista Unicachi entregadas en tu taxi de confianza o en van compartida hasta tu bodega en Lurín." },
     { property: "og:title", content: "Mercantista — Tu bodega abastecida, sin salir de ella" },
@@ -48,7 +50,7 @@ function Index() {
         </div>
       </section>
 
-      <section><SectionTitle title="¿Cómo funciona?" /><HowItWorks /></section>
+      <section><SectionTitle title="¿Cómo funciona?" /><HowItWorks /><div className="mt-6 grid gap-4 md:grid-cols-2"><p className="text-lg"><b>Entrega tipo 1 · Compra y subida a tu taxi</b><br />S/ 50 fijo. Compramos a tus caseros y subimos todo a tu taxi en Unicachi.</p><p className="text-lg"><b>Entrega tipo 2 · Hasta tu bodega o almacén</b><br />Desde S/ 100 según tu zona y el peso. Lo llevamos en van compartida hasta tu local.</p></div></section>
 
       <div className="grid gap-3 md:grid-cols-3">
         {[[TrendingUp, "Precios directos de Unicachi"], [Clock, "Entregas programadas en la mañana"], [MessageCircle, "Atención personalizada por WhatsApp"]].map(([I, t]) => {

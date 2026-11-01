@@ -7,6 +7,8 @@ import type { Tramo } from "@/lib/pricing";
 
 export const Route = createFileRoute("/servicios")({
   head: () => ({ meta: [
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
     { title: "Servicios y tarifas — Mercantista" },
     { name: "description", content: "Compra y subida a tu taxi por S/ 50, o entrega en tu bodega en van compartida según zona y peso." },
     { property: "og:title", content: "Servicios y tarifas — Mercantista" },
@@ -32,7 +34,7 @@ function Servicios() {
           <Truck className="h-8 w-8 text-primary" />
           <h2 className="mt-3 text-xl font-bold">Entrega tipo 2 · Hasta tu bodega o almacén</h2>
           <p className="mt-2 text-sm text-muted-foreground">Lo llevamos en van compartida hasta tu local. Máximo 750 kg por pedido.</p>
-          <p className="mt-3 font-semibold">Precio total según zona y peso. Sin cobros aparte.</p>
+          <p className="mt-3 font-semibold">Desde S/ 100 según tu zona y el peso. Sin cobros aparte.</p>
         </div>
       </div>
       <section><h2 className="mb-3 text-2xl font-bold">Simulador de tarifa</h2><Simulator /></section>
