@@ -62,6 +62,7 @@ export function Header() {
       <nav className="mx-auto flex max-w-7xl flex-wrap items-center gap-1 px-4 pb-2">
         {links.map(([to, l]) => <Link key={to} to={to} className="hidden rounded-lg px-3 py-1.5 text-sm text-muted-foreground hover:bg-muted md:block [&.active]:bg-accent [&.active]:text-accent-foreground">{l}</Link>)}
       </nav>
+      <WelcomeDialog />
     </header>
   );
 }
