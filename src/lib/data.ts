@@ -1,4 +1,4 @@
-// Datos demostrativos de Mercantista (no verificados).
+// Datos de Mercantista.
 export type Category = "tuberculos" | "cebollas" | "hortalizas" | "hojas" | "frutas" | "citricos" | "abarrotes";
 
 export const CATEGORIES: { id: Category; name: string; desc: string; emoji: string }[] = [

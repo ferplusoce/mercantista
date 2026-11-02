@@ -118,7 +118,7 @@ function Checkout() {
 
         <Card className="grid gap-3 md:grid-cols-2">
           <h2 className="font-bold md:col-span-2">Pago</h2>
-          <p className="rounded-xl bg-secondary p-3 text-sm md:col-span-2">Por ser mercado mayorista, validamos el precio exacto en Unicachi durante la madrugada y te avisamos cualquier diferencia antes de cobrar. <b>Modo demostrativo: no se procesan pagos reales.</b></p>
+          <p className="rounded-xl bg-secondary p-3 text-sm md:col-span-2">Por ser mercado mayorista, validamos el precio exacto en Unicachi durante la madrugada y te avisamos cualquier diferencia antes de cobrar. <b>El pago se coordina por Yape, Plin, transferencia o contra entrega; no se procesan pagos en línea.</b></p>
           <Field label="Modalidad"><select className={inputCls} value={f.plan} onChange={set("plan")}>{PLANS.map((x) => <option key={x}>{x}</option>)}</select></Field>
           <Field label="Método preferido"><select className={inputCls} value={f.method} onChange={set("method")}>{METHODS.map((x) => <option key={x}>{x}</option>)}</select></Field>
           <Field label="DNI o RUC"><input className={inputCls} value={f.doc} onChange={set("doc")} /></Field>
