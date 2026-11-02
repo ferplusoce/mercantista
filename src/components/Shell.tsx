@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Home, LayoutGrid, MapPin, PackageSearch, Search, ShoppingBag, Store, User, ClipboardList, Leaf } from "lucide-react";
 import { useStore } from "@/lib/store";
 import { PRODUCTS, VENDORS } from "@/lib/data";
+import { WelcomeDialog } from "@/components/Welcome";
 
 export function Logo() {
   return (
