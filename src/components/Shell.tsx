@@ -3,7 +3,6 @@ import { useState } from "react";
 import { Home, LayoutGrid, MapPin, PackageSearch, Search, ShoppingBag, Store, User, ClipboardList, Leaf } from "lucide-react";
 import { useStore } from "@/lib/store";
 import { PRODUCTS, VENDORS } from "@/lib/data";
-import { Welcome } from "@/components/Welcome";
 
 export function Logo() {
   return (
@@ -46,7 +45,7 @@ export function Header() {
   return (
     <header className="sticky top-0 z-40 border-b bg-background/90 backdrop-blur">
       <div className="bg-foreground px-4 py-1.5 text-center text-xs text-background">
-        <MapPin className="mr-1 inline h-3 w-3" />Entregas en Lurín y alrededores (Lima Sur) · Versión demostrativa
+        <MapPin className="mr-1 inline h-3 w-3" />Entregas en Lurín y alrededores (Lima Sur)
       </div>
       <div className="mx-auto flex max-w-7xl items-center gap-4 px-4 py-3">
         <Logo />
@@ -61,7 +60,6 @@ export function Header() {
       <div className="px-4 pb-3 md:hidden"><SearchBox /></div>
       <nav className="mx-auto flex max-w-7xl flex-wrap items-center gap-1 px-4 pb-2">
         {links.map(([to, l]) => <Link key={to} to={to} className="hidden rounded-lg px-3 py-1.5 text-sm text-muted-foreground hover:bg-muted md:block [&.active]:bg-accent [&.active]:text-accent-foreground">{l}</Link>)}
-        <Welcome />
       </nav>
     </header>
   );
@@ -86,7 +84,6 @@ export function Footer() {
       <div className="mx-auto grid max-w-7xl gap-6 px-4 py-10 md:grid-cols-3">
         <div><Logo /><p className="mt-2 text-sm text-muted-foreground">Tu bodega abastecida, sin salir de ella.</p></div>
         <p className="text-sm text-muted-foreground">Compramos en el Mercado Mayorista Unicachi y entregamos en Lurín, Pachacámac y Villa El Salvador.</p>
-        <p className="text-xs text-muted-foreground">Puestos, precios y pedidos mostrados son datos demostrativos no verificados.</p>
       </div>
     </footer>
   );

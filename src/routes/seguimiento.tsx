@@ -35,6 +35,7 @@ function Seguimiento() {
   const nav = useNavigate();
   const [q, setQ] = useState(code ?? "");
   const orders = useStore((s) => s.orders);
+  const wa = useStore((s) => s.tariffs.whatsapp);
   const { data: found, isLoading, isError } = useOrderByCode(code);
   const o = found ?? undefined;
   const idx = o ? STATUS_FLOW.indexOf(o.status) : -1;
@@ -70,8 +71,8 @@ function Seguimiento() {
           )}
           <ClientPhotos o={o} />
           <div className="rounded-xl bg-muted p-4 text-sm">
-            <p className="font-semibold">Coordinador de turno en Unicachi</p><p className="text-muted-foreground">Carlos Medina (dato demostrativo)</p>
-            <a href={waLink(`Hola Mercantista, quiero consultar sobre mi pedido ${o.code}`)} target="_blank" rel="noreferrer" className="mt-3 inline-flex h-11 items-center rounded-xl bg-success px-4 font-semibold text-success-foreground"><MessageCircle className="mr-2 h-4 w-4" />Escribir por WhatsApp</a>
+            <p className="font-semibold">Equipo Mercantista</p><p className="text-muted-foreground">Estamos atentos a tu pedido en Unicachi.</p>
+            <a href={waLink(`Hola Mercantista, quiero consultar sobre mi pedido ${o.code}`, wa)} target="_blank" rel="noreferrer" className="mt-3 inline-flex h-11 items-center rounded-xl bg-success px-4 font-semibold text-success-foreground"><MessageCircle className="mr-2 h-4 w-4" />Escríbenos por WhatsApp</a>
           </div>
         </Card>
       )}

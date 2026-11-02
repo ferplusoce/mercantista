@@ -4,6 +4,8 @@ export type Tariffs = {
   /** Precio total por pedido según peso: hasta 200, hasta 450, hasta 750 kg. */
   tramos: Record<Tramo, [number, number, number]>;
   zoneTramo: Record<string, Tramo>;
+  /** Número de WhatsApp de atención al cliente (formato internacional sin +). */
+  whatsapp: string;
 };
 
 export const DEFAULT_TARIFFS: Tariffs = {
@@ -17,6 +19,7 @@ export const DEFAULT_TARIFFS: Tariffs = {
     "Lurín - Km 40 / Arica": 2,
     "Pachacámac (zonas bajas)": 2,
   },
+  whatsapp: "51987654321",
 };
 
 export const MAX_VAN_KG = 750;

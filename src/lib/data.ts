@@ -1,4 +1,4 @@
-// Datos demostrativos de Mercantista (no verificados).
+// Datos de Mercantista.
 export type Category = "tuberculos" | "cebollas" | "hortalizas" | "hojas" | "frutas" | "citricos" | "abarrotes";
 
 export const CATEGORIES: { id: Category; name: string; desc: string; emoji: string }[] = [
@@ -62,5 +62,5 @@ export const ZONES = ["Lurín Cercado", "Lurín - Julio C. Tello", "Lurín - Hue
 export const SLOTS = ["Madrugada (05:30 - 07:30 am)", "Mañana (08:00 - 10:30 am)"] as const;
 
 export const WHATSAPP = "51987654321";
-export const waLink = (msg: string) => `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(msg)}`;
+export const waLink = (msg: string, num: string = WHATSAPP) => `https://wa.me/${num.replace(/\D/g, "")}?text=${encodeURIComponent(msg)}`;
 export const soles = (n: number) => `S/ ${n.toFixed(2)}`;
