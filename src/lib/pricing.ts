@@ -4,6 +4,8 @@ export type Tariffs = {
   /** Precio total por pedido según peso: hasta 200, hasta 450, hasta 750 kg. */
   tramos: Record<Tramo, [number, number, number]>;
   zoneTramo: Record<string, Tramo>;
+  /** Número de WhatsApp de atención al cliente (formato internacional sin +). */
+  whatsapp: string;
 };
 
 export const DEFAULT_TARIFFS: Tariffs = {
