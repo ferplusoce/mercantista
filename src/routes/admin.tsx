@@ -232,6 +232,7 @@ function Tarifas() {
     <div className="space-y-4">
       <Card className="grid gap-3 md:grid-cols-3">
         <label className="text-sm"><span className="text-muted-foreground">Entrega tipo 1 · Compra y subida a tu taxi: fijo por pedido S/</span><input type="number" className={inputCls} value={t.taxiFlat} onChange={(e) => set({ taxiFlat: +e.target.value })} /></label>
+        <label className="text-sm"><span className="text-muted-foreground">WhatsApp de atención (con código de país, sin +)</span><input className={inputCls} inputMode="tel" value={t.whatsapp} onChange={(e) => set({ whatsapp: e.target.value.replace(/\D/g, "") })} placeholder="51987654321" /></label>
       </Card>
       <Card className="overflow-x-auto">
         <table className="w-full text-sm"><thead className="text-left text-muted-foreground"><tr><th className="p-2">Entrega tipo 2 · Hasta tu bodega o almacén</th><th className="p-2">Hasta 200 kg</th><th className="p-2">Hasta 450 kg</th><th className="p-2">Hasta 750 kg</th></tr></thead>
@@ -255,7 +256,7 @@ function Reportes() {
         <Stat l="Ingresos van (pedidos actuales)" v={soles(income)} />
         <Stat l="Costo diario promedio" v={soles(data.reduce((s, d) => s + d.costos, 0) / data.length)} />
       </div>
-      <Card><p className="mb-2 font-semibold">Costos operativos vs ingresos (incluye depreciación S/ 12/día) · demostrativo</p>
+      <Card><p className="mb-2 font-semibold">Costos operativos vs ingresos (incluye depreciación S/ 12/día)</p>
         <ResponsiveContainer width="100%" height={260}><LineChart data={data}><CartesianGrid strokeDasharray="3 3" stroke="var(--border)" /><XAxis dataKey="dia" /><YAxis /><Tooltip /><Legend /><Line dataKey="ingresos" stroke="var(--success)" strokeWidth={2} /><Line dataKey="costos" stroke="var(--primary)" strokeWidth={2} /><Line dataKey="margen" stroke="var(--foreground)" strokeDasharray="4 4" /></LineChart></ResponsiveContainer>
       </Card>
     </div>

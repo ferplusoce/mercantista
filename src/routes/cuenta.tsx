@@ -5,6 +5,7 @@ import { RotateCcw, Trash2 } from "lucide-react";
 import { ZONES, soles } from "@/lib/data";
 import { STATUS_LABEL, addToCart, setState, useStore } from "@/lib/store";
 import { Card, Field, inputCls } from "@/components/Field";
+import { Welcome } from "@/components/Welcome";
 
 export const Route = createFileRoute("/cuenta")({
   head: () => ({ meta: [
@@ -28,8 +29,11 @@ function Cuenta() {
   const repeat = (items: { productId: string; qty: number }[]) => { items.forEach((i) => addToCart(i.productId, i.qty)); toast.success("Productos agregados al pedido"); nav({ to: "/carrito" }); };
   return (
     <div className="space-y-5">
-      <h1 className="text-3xl font-bold">Mi cuenta</h1>
-      <p className="text-sm text-muted-foreground">Perfil demostrativo guardado en este dispositivo.</p>
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <h1 className="text-3xl font-bold">Mi cuenta</h1>
+        <Welcome />
+      </div>
+      <p className="text-sm text-muted-foreground">Tus datos se guardan en este celular.</p>
       <Card className="grid gap-3 md:grid-cols-4">
         <Field label="Bodega"><input className={inputCls} value={p.business} onChange={upd("business")} /></Field>
         <Field label="Dueño"><input className={inputCls} value={p.owner} onChange={upd("owner")} /></Field>
