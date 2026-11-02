@@ -19,6 +19,7 @@ export const DEFAULT_TARIFFS: Tariffs = {
     "Lurín - Km 40 / Arica": 2,
     "Pachacámac (zonas bajas)": 2,
   },
+  whatsapp: "51987654321",
 };
 
 export const MAX_VAN_KG = 750;
