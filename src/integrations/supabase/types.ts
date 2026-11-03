@@ -14,6 +14,30 @@ export type Database = {
   }
   public: {
     Tables: {
+      categories: {
+        Row: {
+          description: string
+          id: string
+          image_url: string | null
+          name: string
+          sort_order: number
+        }
+        Insert: {
+          description?: string
+          id: string
+          image_url?: string | null
+          name: string
+          sort_order?: number
+        }
+        Update: {
+          description?: string
+          id?: string
+          image_url?: string | null
+          name?: string
+          sort_order?: number
+        }
+        Relationships: []
+      }
       opinions: {
         Row: {
           armo_sin_ayuda: boolean | null
@@ -207,6 +231,72 @@ export type Database = {
         }
         Relationships: []
       }
+      products: {
+        Row: {
+          active: boolean
+          availability: string
+          category_id: string | null
+          description: string
+          format: string
+          id: string
+          image_url: string | null
+          name: string
+          price: number
+          quality: string
+          unit: string
+          updated_at: string
+          vendor_id: string
+          weight_kg: number
+        }
+        Insert: {
+          active?: boolean
+          availability?: string
+          category_id?: string | null
+          description?: string
+          format: string
+          id?: string
+          image_url?: string | null
+          name: string
+          price?: number
+          quality?: string
+          unit: string
+          updated_at?: string
+          vendor_id: string
+          weight_kg?: number
+        }
+        Update: {
+          active?: boolean
+          availability?: string
+          category_id?: string | null
+          description?: string
+          format?: string
+          id?: string
+          image_url?: string | null
+          name?: string
+          price?: number
+          quality?: string
+          unit?: string
+          updated_at?: string
+          vendor_id?: string
+          weight_kg?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "products_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "products_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       requests: {
         Row: {
           address: string
@@ -255,6 +345,27 @@ export type Database = {
         }
         Relationships: []
       }
+      settings: {
+        Row: {
+          id: number
+          tariffs: Json
+          updated_at: string
+          whatsapp: string
+        }
+        Insert: {
+          id?: number
+          tariffs: Json
+          updated_at?: string
+          whatsapp?: string
+        }
+        Update: {
+          id?: number
+          tariffs?: Json
+          updated_at?: string
+          whatsapp?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           id: string
@@ -270,6 +381,48 @@ export type Database = {
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
           user_id?: string
+        }
+        Relationships: []
+      }
+      vendors: {
+        Row: {
+          active: boolean
+          contact: string
+          id: string
+          name: string
+          pavilion: string
+          phone: string
+          rating: number
+          schedule: string
+          specialty: string
+          stall: string
+          verified: boolean
+        }
+        Insert: {
+          active?: boolean
+          contact?: string
+          id: string
+          name: string
+          pavilion?: string
+          phone?: string
+          rating?: number
+          schedule?: string
+          specialty?: string
+          stall?: string
+          verified?: boolean
+        }
+        Update: {
+          active?: boolean
+          contact?: string
+          id?: string
+          name?: string
+          pavilion?: string
+          phone?: string
+          rating?: number
+          schedule?: string
+          specialty?: string
+          stall?: string
+          verified?: boolean
         }
         Relationships: []
       }
@@ -350,6 +503,13 @@ export type Database = {
           _item_index: number
         }
         Returns: string
+      }
+      top_products: {
+        Args: { _days?: number; _limit?: number }
+        Returns: {
+          product_id: string
+          units: number
+        }[]
       }
     }
     Enums: {
