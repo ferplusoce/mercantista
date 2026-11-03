@@ -43,6 +43,13 @@
       "when": 1793509731915,
       "tag": "0005_restrict_request_grants",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1793735155414,
+      "tag": "0006_catalog_tables",
+      "breakpoints": true
     }
   ]
 }

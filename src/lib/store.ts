@@ -1,6 +1,5 @@
 import { useSyncExternalStore } from "react";
-import { PRODUCTS, VENDORS, type Product, type Vendor } from "./data";
-import { DEFAULT_TARIFFS, type Tariffs } from "./pricing";
+import type { Product } from "./data";
 
 export type CartItem = { productId: string; qty: number; note: string };
 export type OrderStatus = "received" | "verifying" | "purchasing" | "staging" | "on_the_way" | "delivered" | "cancelled";
@@ -18,11 +17,11 @@ export type CustomRequest = { code: string; createdAt: string; business: string;
 export type Profile = { business: string; owner: string; phone: string; doc: string; addresses: { zone: string; line: string; ref: string }[]; taxis: { driver: string; plate: string; phone: string }[] };
 export type Cost = { date: string; fuel: number; driver: number; maintenance: number; other: number };
 
-type State = { cart: CartItem[]; orders: Order[]; requests: CustomRequest[]; products: Product[]; vendors: Vendor[]; tariffs: Tariffs; profile: Profile; costs: Cost[] };
+type State = { cart: CartItem[]; orders: Order[]; requests: CustomRequest[]; profile: Profile; costs: Cost[] };
 
 const today = new Date().toISOString().slice(0, 10);
 const initial = (): State => ({
-  cart: [], products: PRODUCTS, vendors: VENDORS, tariffs: DEFAULT_TARIFFS,
+  cart: [],
   orders: [], // copia local de los pedidos hechos desde este dispositivo
   requests: [],
   profile: { business: "Bodega Don Pepe", owner: "José Ramírez", phone: "999111222", doc: "10456789123", addresses: [{ zone: "Lurín Cercado", line: "Av. Principal 123", ref: "Frente al parque, portón verde" }], taxis: [{ driver: "Pedro Salas", plate: "ABC-123", phone: "988777666" }] },
@@ -36,7 +35,7 @@ const listeners = new Set<() => void>();
 function load() {
   if (loaded || typeof window === "undefined") return;
   loaded = true;
-  try { const raw = localStorage.getItem(KEY); if (raw) state = { ...state, ...JSON.parse(raw) }; state.tariffs = state.tariffs?.tramos ? { ...DEFAULT_TARIFFS, ...state.tariffs } : DEFAULT_TARIFFS; } catch { /* ignore */ }
+  try { const raw = localStorage.getItem(KEY); if (raw) { const { products: _p, vendors: _v, tariffs: _t, ...rest } = JSON.parse(raw); state = { ...state, ...rest }; } } catch { /* ignore */ }
 }
 export function setState(fn: (s: State) => Partial<State>) {
   load();
@@ -72,7 +71,7 @@ export const STATUS_FLOW: OrderStatus[] = ["received", "verifying", "purchasing"
 
 /** Resume el carrito con productos actuales. */
 export function cartSummary(cart: CartItem[], products: Product[]) {
-  const lines = cart.map((c) => ({ ...c, product: products.find((p) => p.id === c.productId)! })).filter((l) => l.product);
+  const lines = cart.map((c) => ({ ...c, product: products.find((p) => p.id === c.productId)! })).filter((l) => l.product && l.product.active !== false);
   const subtotal = lines.reduce((s, l) => s + l.qty * l.product.price, 0);
   const weightKg = lines.reduce((s, l) => s + l.qty * l.product.weightKg, 0);
   const packages = lines.reduce((s, l) => s + l.qty, 0);
