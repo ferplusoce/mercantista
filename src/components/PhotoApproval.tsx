@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Camera, Check, Pencil } from "lucide-react";
 import { toast } from "sonner";
 import { soles } from "@/lib/data";
-import { useStore, type Order } from "@/lib/store";
+import { type Order } from "@/lib/store";
 import { responseMinutes, useOrderPhotos, usePhotoActions } from "@/lib/photos";
 
 const STATUS_TXT = { pendiente: "Esperando al cliente", aprobado: "Aprobado", cambiar: "Pide cambio" } as const;
