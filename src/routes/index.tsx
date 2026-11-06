@@ -1,9 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Clock, MessageCircle, ShoppingBag, ClipboardList, TrendingUp } from "lucide-react";
 import hero from "@/assets/hero.jpg";
-import { CATEGORIES } from "@/lib/data";
-import { useStore } from "@/lib/store";
-import { ProductCard } from "@/components/ProductCard";
+import { useQuery } from "@tanstack/react-query";
+import { fetchTopProductIds, pickTopProducts, useCatalog } from "@/lib/catalog";
+import { addToCart } from "@/lib/store";
+import { soles, type Product } from "@/lib/data";
+import { toast } from "sonner";
+import { Photo, ProductCard } from "@/components/ProductCard";
 import { VendorCard } from "@/components/VendorCard";
 import { InstallButton } from "@/components/InstallButton";
 import { HowItWorks } from "@/components/HowItWorks";
@@ -29,9 +32,24 @@ function SectionTitle({ title, sub, link }: { title: string; sub?: string; link?
   );
 }
 
+function TopCard({ p }: { p: Product }) {
+  return (
+    <div className="flex flex-col rounded-2xl border bg-card p-2 shadow-sm">
+      <Photo src={p.image} name={p.name} className="h-28" />
+      <p className="mt-2 text-sm font-semibold leading-tight">{p.name}</p>
+      <p className="text-xs text-muted-foreground">{p.unit}</p>
+      <p className="mt-1 font-display text-lg font-bold">{soles(p.price)}</p>
+      <button disabled={p.availability === "agotado"} onClick={() => { addToCart(p.id, 1); toast.success(`${p.name} agregado`); }} className="mt-auto h-11 rounded-xl bg-primary text-base font-semibold text-primary-foreground disabled:opacity-40">Agregar</button>
+    </div>
+  );
+}
+
 function Index() {
-  const products = useStore((s) => s.products);
-  const vendors = useStore((s) => s.vendors);
+  const { products: all, vendors: allV, categories } = useCatalog();
+  const products = all.filter((p) => p.active);
+  const vendors = allV.filter((v) => v.active);
+  const top = useQuery({ queryKey: ["top-products"], queryFn: fetchTopProductIds, staleTime: 5 * 60_000 });
+  const masPedido = pickTopProducts(products, top.data ?? []);
   return (
     <div className="space-y-14">
       <section className="relative overflow-hidden rounded-3xl">
@@ -59,12 +77,17 @@ function Index() {
         })}
       </div>
 
+      {masPedido.length > 0 && <section>
+        <SectionTitle title="Lo más pedido" sub="Lo que más compran las bodegas este mes" />
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">{masPedido.map((p) => <TopCard key={p.id} p={p} />)}</div>
+      </section>}
+
       <section>
         <SectionTitle title="Categorías" sub="Todo por mayor: sacos, jabas, mallas y atados" />
         <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-6">
-          {CATEGORIES.map((c) => (
+          {categories.map((c) => (
             <Link key={c.id} to="/catalogo" search={{ cat: c.id }} className="rounded-2xl border bg-card p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
-              <div className="text-4xl">{c.emoji}</div>
+              <Photo src={c.image} name={c.name} className="h-20 text-xs" />
               <p className="mt-2 font-semibold leading-tight">{c.name}</p>
               <p className="text-xs text-muted-foreground">{c.desc}</p>
             </Link>
