@@ -35,7 +35,7 @@ function Catalogo() {
   const [sort, setSort] = useState("rel");
 
   const list = useMemo(() => {
-    const r = products.filter((p) => (!q || p.name.toLowerCase().includes(q.toLowerCase())) && (!cat || p.category === cat) && (!vendor || p.vendorId === vendor) && (!format || p.format === format) && p.price <= max && (!onlyStock || p.availability === "disponible"));
+    const r = products.filter((p) => p.active && (!q || p.name.toLowerCase().includes(q.toLowerCase())) && (!cat || p.category === cat) && (!vendor || p.vendorId === vendor) && (!format || p.format === format) && p.price <= max && (!onlyStock || p.availability === "disponible"));
     if (sort === "asc") r.sort((a, b) => a.price - b.price);
     if (sort === "desc") r.sort((a, b) => b.price - a.price);
     return r;
@@ -55,7 +55,7 @@ function Catalogo() {
         <label className="flex items-center gap-2 text-sm lg:col-span-3"><Switch checked={onlyStock} onCheckedChange={setOnlyStock} />Solo stock confirmado hoy</label>
       </div>
       <p className="text-sm text-muted-foreground">{list.length} productos</p>
-      {list.length === 0 ? (
+      {!loaded ? <p className="p-10 text-center text-muted-foreground">Cargando catálogo...</p> : list.length === 0 ? (
         <div className="rounded-2xl border bg-card p-10 text-center"><SearchX className="mx-auto h-10 w-10 text-muted-foreground" /><p className="mt-2 font-semibold">No encontramos productos con esos filtros</p><p className="text-sm text-muted-foreground">Prueba otros filtros o envíanos una solicitud personalizada.</p></div>
       ) : (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">{list.map((p) => <ProductCard key={p.id} p={p} />)}</div>

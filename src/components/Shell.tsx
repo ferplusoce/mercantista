@@ -17,6 +17,7 @@ export function Logo() {
 function SearchBox() {
   const [q, setQ] = useState("");
   const nav = useNavigate();
+  const cat = useCatalog();
   const term = q.trim().toLowerCase();
   const hits = term.length < 2 ? [] : [
     ...cat.products.filter((p) => p.name.toLowerCase().includes(term)).slice(0, 5).map((p) => ({ label: p.name, sub: "Producto", go: () => nav({ to: "/catalogo", search: { q: p.name } }) })),
