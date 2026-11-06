@@ -2,6 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { Check, MessageCircle, PackageSearch } from "lucide-react";
 import { soles, waLink } from "@/lib/data";
+import { useCatalog } from "@/lib/catalog";
 import { STATUS_FLOW, STATUS_LABEL, useStore, type Order } from "@/lib/store";
 import { Card } from "@/components/Field";
 import { useOrderByCode } from "@/lib/orders";
@@ -35,7 +36,7 @@ function Seguimiento() {
   const nav = useNavigate();
   const [q, setQ] = useState(code ?? "");
   const orders = useStore((s) => s.orders);
-  const wa = useStore((s) => s.tariffs.whatsapp);
+  const wa = useCatalog().tariffs.whatsapp;
   const { data: found, isLoading, isError } = useOrderByCode(code);
   const o = found ?? undefined;
   const idx = o ? STATUS_FLOW.indexOf(o.status) : -1;

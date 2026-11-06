@@ -1,8 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { SearchX } from "lucide-react";
-import { CATEGORIES, FORMATS, type Category } from "@/lib/data";
-import { useStore } from "@/lib/store";
+import { FORMATS, type Category } from "@/lib/data";
+import { useCatalog } from "@/lib/catalog";
 import { PriceNote, ProductCard } from "@/components/ProductCard";
 import { Switch } from "@/components/ui/switch";
 
@@ -24,8 +24,8 @@ const sel = "h-11 rounded-xl border bg-card px-3 text-sm";
 
 function Catalogo() {
   const s = Route.useSearch();
-  const products = useStore((x) => x.products);
-  const vendors = useStore((x) => x.vendors);
+  const { products, vendors: allVendors, categories, loaded } = useCatalog();
+  const vendors = allVendors.filter((v) => v.active);
   const [q, setQ] = useState(s.q ?? "");
   const [cat, setCat] = useState<string>(s.cat ?? "");
   const [vendor, setVendor] = useState(s.vendor ?? "");
@@ -47,7 +47,7 @@ function Catalogo() {
       <PriceNote />
       <div className="grid gap-2 rounded-2xl border bg-card p-3 shadow-sm sm:grid-cols-2 lg:grid-cols-6">
         <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Buscar producto…" className={sel + " lg:col-span-2"} />
-        <select value={cat} onChange={(e) => setCat(e.target.value)} className={sel}><option value="">Todo tipo</option>{CATEGORIES.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}<option value="abarrotes">Abarrotes</option></select>
+        <select value={cat} onChange={(e) => setCat(e.target.value)} className={sel}><option value="">Todo tipo</option>{categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}</select>
         <select value={vendor} onChange={(e) => setVendor(e.target.value)} className={sel}><option value="">Todos los puestos</option>{vendors.map((v) => <option key={v.id} value={v.id}>{v.stall} · {v.name}</option>)}</select>
         <select value={format} onChange={(e) => setFormat(e.target.value)} className={sel}><option value="">Todo formato</option>{FORMATS.map((f) => <option key={f}>{f}</option>)}</select>
         <select value={sort} onChange={(e) => setSort(e.target.value)} className={sel}><option value="rel">Relevancia</option><option value="asc">Precio: menor</option><option value="desc">Precio: mayor</option></select>

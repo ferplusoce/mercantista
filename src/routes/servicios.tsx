@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Car, Truck } from "lucide-react";
 import { ZONES, soles } from "@/lib/data";
-import { useStore } from "@/lib/store";
+import { useCatalog } from "@/lib/catalog";
 import { Simulator } from "@/components/Simulator";
 import type { Tramo } from "@/lib/pricing";
 
@@ -18,7 +18,7 @@ export const Route = createFileRoute("/servicios")({
 });
 
 function Servicios() {
-  const t = useStore((s) => s.tariffs);
+  const t = useCatalog().tariffs;
   return (
     <div className="space-y-8">
       <h1 className="text-3xl font-bold">Servicios y tarifas</h1>

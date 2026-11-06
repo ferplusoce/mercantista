@@ -7,6 +7,7 @@ import { vanFee, taxiFee } from "@/lib/pricing";
 import { createOrder } from "@/lib/orders";
 import { markOrderSent } from "@/lib/opinions";
 import { OpinionForm } from "@/components/OpinionForm";
+import { useCatalog } from "@/lib/catalog";
 import { cartSummary, clearCart, setState, useStore, type Order } from "@/lib/store";
 import { Card, Field, inputCls, requireFields } from "@/components/Field";
 
@@ -27,9 +28,7 @@ const METHODS = ["Yape / Plin", "Transferencia BCP / BBVA / Interbank", "Efectiv
 
 function Checkout() {
   const cart = useStore((s) => s.cart);
-  const products = useStore((s) => s.products);
-  const vendors = useStore((s) => s.vendors);
-  const t = useStore((s) => s.tariffs);
+  const { products, vendors, tariffs: t } = useCatalog();
   const profile = useStore((s) => s.profile);
   const sum = cartSummary(cart, products);
   const [service, setService] = useState<Order["service"]>("minivan_delivery");

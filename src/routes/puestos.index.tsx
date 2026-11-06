@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { useStore } from "@/lib/store";
+import { useCatalog } from "@/lib/catalog";
 import { VendorCard } from "@/components/VendorCard";
 
 export const Route = createFileRoute("/puestos/")({
@@ -16,7 +16,7 @@ export const Route = createFileRoute("/puestos/")({
 });
 
 function Puestos() {
-  const vendors = useStore((s) => s.vendors).filter((v) => v.active);
+  const vendors = useCatalog().vendors.filter((v) => v.active);
   const [q, setQ] = useState("");
   const [pab, setPab] = useState("");
   const list = vendors.filter((v) => (v.name + v.stall + v.specialty).toLowerCase().includes(q.toLowerCase()) && (!pab || v.pavilion === pab));

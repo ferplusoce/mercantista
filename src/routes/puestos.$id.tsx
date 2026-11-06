@@ -1,11 +1,11 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { BadgeCheck, Clock, MapPin, User } from "lucide-react";
-import { VENDORS } from "@/lib/data";
-import { useStore } from "@/lib/store";
+import { supabase } from "@/integrations/supabase/client";
+import { useCatalog } from "@/lib/catalog";
 import { PriceNote, ProductCard } from "@/components/ProductCard";
 
 export const Route = createFileRoute("/puestos/$id")({
-  loader: ({ params }) => { const v = VENDORS.find((x) => x.id === params.id); if (!v) throw notFound(); return { name: v.name, stall: v.stall }; },
+  loader: async ({ params }) => { const { data: v } = await supabase.from("vendors").select("name, stall").eq("id", params.id).maybeSingle(); if (!v) throw notFound(); return { name: v.name, stall: v.stall }; },
   head: ({ loaderData }) => ({ meta: [
     { property: "og:type", content: "website" },
     { name: "twitter:card", content: "summary" },
@@ -19,8 +19,10 @@ export const Route = createFileRoute("/puestos/$id")({
 
 function Puesto() {
   const { id } = Route.useParams();
-  const v = useStore((s) => s.vendors).find((x) => x.id === id)!;
-  const products = useStore((s) => s.products).filter((p) => p.vendorId === id);
+  const c = useCatalog();
+  const v = c.vendors.find((x) => x.id === id);
+  const products = c.products.filter((p) => p.vendorId === id && p.active);
+  if (!v) return <p className="p-10 text-center text-muted-foreground">{c.loaded ? "Puesto no encontrado." : "Cargando puesto..."}</p>;
   return (
     <div className="space-y-6">
       <div className="rounded-3xl border bg-card p-6 shadow-sm md:p-8">

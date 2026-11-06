@@ -2,7 +2,8 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Package, ShoppingBag, Store, Trash2, Weight } from "lucide-react";
 import { soles } from "@/lib/data";
 import { cartSummary, updateCart, useStore } from "@/lib/store";
-import { QtyPicker, PriceNote } from "@/components/ProductCard";
+import { useCatalog } from "@/lib/catalog";
+import { Photo, QtyPicker, PriceNote } from "@/components/ProductCard";
 
 export const Route = createFileRoute("/carrito")({
   head: () => ({ meta: [
@@ -18,8 +19,7 @@ export const Route = createFileRoute("/carrito")({
 
 function Carrito() {
   const cart = useStore((s) => s.cart);
-  const products = useStore((s) => s.products);
-  const vendors = useStore((s) => s.vendors);
+  const { products, vendors } = useCatalog();
   const sum = cartSummary(cart, products);
   if (!sum.lines.length) return (
     <div className="mx-auto max-w-md rounded-2xl border bg-card p-10 text-center">
@@ -40,7 +40,7 @@ function Carrito() {
             {lines.map((l) => (
               <div key={l.productId} className="space-y-2 border-b p-4 last:border-0">
                 <div className="flex items-start gap-3">
-                  <span className="text-3xl">{l.product.emoji}</span>
+                  <Photo src={l.product.image} name={l.product.name} className="h-14 w-14 shrink-0 text-[10px]" />
                   <div className="flex-1"><p className="font-semibold">{l.product.name}</p><p className="text-sm text-muted-foreground">{l.product.unit} · {soles(l.product.price)} c/u</p></div>
                   <p className="font-bold tabular-nums">{soles(l.qty * l.product.price)}</p>
                 </div>
