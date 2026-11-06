@@ -2,19 +2,25 @@ import { useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { Minus, Plus, Store } from "lucide-react";
 import { toast } from "sonner";
-import { CATEGORIES, VENDORS, soles, type Product } from "@/lib/data";
-import { addToCart, useStore } from "@/lib/store";
+import { soles, type Product } from "@/lib/data";
+import { addToCart } from "@/lib/store";
+import { useCatalog } from "@/lib/catalog";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
-const tint: Record<string, string> = { tuberculos: "bg-secondary", cebollas: "bg-accent", hortalizas: "bg-accent", hojas: "bg-success/15", frutas: "bg-secondary", citricos: "bg-success/10", abarrotes: "bg-muted" };
 
 export function AvailBadge({ a }: { a: Product["availability"] }) {
   const m = { disponible: ["Stock confirmado hoy", "bg-success/15 text-success"], agotado: ["Agotado en Unicachi", "bg-destructive/10 text-destructive"], por_confirmar: ["Precio por confirmar", "bg-secondary text-secondary-foreground"] }[a];
   return <span className={`rounded-full px-2 py-0.5 text-[11px] font-medium ${m[1]}`}>{m[0]}</span>;
 }
 
+/** Foto liviana (lazy, tamaño fijo) o recuadro gris con el nombre cuando no hay foto. */
+export function Photo({ src, name, className }: { src: string | null; name: string; className: string }) {
+  if (!src) return <div className={`grid place-items-center rounded-xl bg-muted p-2 text-center text-sm font-semibold text-muted-foreground ${className}`}>{name}</div>;
+  return <img src={src} alt={name} loading="lazy" decoding="async" width={320} height={240} className={`w-full rounded-xl bg-muted object-cover ${className}`} />;
+}
+
 export function ProductImage({ p, big }: { p: Product; big?: boolean }) {
-  return <div className={`grid place-items-center rounded-xl ${tint[p.category]} ${big ? "h-48 text-8xl" : "h-32 text-6xl"}`}>{p.emoji}</div>;
+  return <Photo src={p.image} name={p.name} className={big ? "h-48" : "h-32"} />;
 }
 
 export function QtyPicker({ value, onChange }: { value: number; onChange: (n: number) => void }) {
@@ -30,15 +36,15 @@ export function QtyPicker({ value, onChange }: { value: number; onChange: (n: nu
 export function ProductCard({ p }: { p: Product }) {
   const [qty, setQty] = useState(1);
   const [open, setOpen] = useState(false);
-  const v = VENDORS.find((x) => x.id === p.vendorId)!;
-  const products = useStore((s) => s.products);
+  const { products, vendors, categories } = useCatalog();
+  const v = vendors.find((x) => x.id === p.vendorId) ?? { id: p.vendorId, name: "Puesto", stall: "-", pavilion: "-", schedule: "" };
   const add = (n: number) => { addToCart(p.id, n); toast.success(`${n} × ${p.unit} de ${p.name} agregado al pedido`); };
   return (
     <div className="flex flex-col rounded-2xl border bg-card p-3 shadow-sm">
       <button onClick={() => setOpen(true)} className="text-left">
         <ProductImage p={p} />
         <div className="mt-3 flex flex-wrap gap-1.5">
-          <span className="rounded-full bg-muted px-2 py-0.5 text-[11px]">{CATEGORIES.find((c) => c.id === p.category)?.name.split(",")[0] ?? "Abarrotes"}</span>
+          <span className="rounded-full bg-muted px-2 py-0.5 text-[11px]">{categories.find((c) => c.id === p.category)?.name.split(",")[0] ?? "Otros"}</span>
           <span className="rounded-full bg-accent px-2 py-0.5 text-[11px] text-accent-foreground">Puesto {v.stall}</span>
         </div>
         <h3 className="mt-2 font-semibold leading-tight">{p.name}</h3>
@@ -68,7 +74,7 @@ export function ProductCard({ p }: { p: Product }) {
           <p className="rounded-xl bg-secondary p-3 text-xs">El precio mayorista varía cada madrugada según la oferta de Unicachi. Te confirmamos el monto exacto antes de comprar.</p>
           <div>
             <p className="mb-2 text-sm font-semibold">Más de este puesto</p>
-            <div className="flex flex-wrap gap-2">{products.filter((x) => x.vendorId === p.vendorId && x.id !== p.id).map((x) => <span key={x.id} className="rounded-full border px-2.5 py-1 text-xs">{x.emoji} {x.name}</span>)}</div>
+            <div className="flex flex-wrap gap-2">{products.filter((x) => x.vendorId === p.vendorId && x.id !== p.id).map((x) => <span key={x.id} className="rounded-full border px-2.5 py-1 text-xs">{x.name}</span>)}</div>
           </div>
           <button disabled={p.availability === "agotado"} onClick={() => { add(qty); setOpen(false); }} className="h-12 rounded-xl bg-primary font-semibold text-primary-foreground disabled:opacity-40">Agregar {qty} al pedido · {soles(qty * p.price)}</button>
         </DialogContent>

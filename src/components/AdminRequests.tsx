@@ -1,9 +1,9 @@
+import { useCatalog } from "@/lib/catalog";
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { REQUEST_STATUS } from "@/lib/requests";
-import { useStore } from "@/lib/store";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { inputCls } from "@/components/Field";
@@ -12,7 +12,7 @@ import type { Database } from "@/integrations/supabase/types";
 type Request = Database["public"]["Tables"]["requests"]["Row"];
 export function AdminRequests() {
   const cache = useQueryClient();
-  const vendors = useStore((s) => s.vendors);
+  const vendors = useCatalog().vendors;
   const [selected, setSelected] = useState<Request | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const q = useQuery({ queryKey: ["requests"], refetchInterval: 30000, queryFn: async () => {

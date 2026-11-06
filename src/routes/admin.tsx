@@ -3,8 +3,10 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { Bar, BarChart, CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { Lock, Pause, Play, Plus, Trash2 } from "lucide-react";
-import { ZONES, soles, type Vendor, type Availability } from "@/lib/data";
-import { STATUS_FLOW, STATUS_LABEL, setState, useStore, type Order, type OrderStatus } from "@/lib/store";
+import { ZONES, soles, type Vendor, type Availability, type Product } from "@/lib/data";
+import { addProduct, addVendor, bulkPrice, deleteProduct, deleteVendor, patchProduct, patchSettings, patchVendor, uploadImage, useCatalog } from "@/lib/catalog";
+import { Photo } from "@/components/ProductCard";
+import { STATUS_FLOW, STATUS_LABEL, useStore, type Order, type OrderStatus } from "@/lib/store";
 import { useAdmin, useAllOrders, useOrderMutations } from "@/lib/orders";
 import { supabase } from "@/integrations/supabase/client";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -85,7 +87,7 @@ function Stat({ l, v }: { l: string; v: string }) { return <Card><p className="t
 
 function Resumen() {
   const orders = (useAllOrders().data ?? []).filter((o) => o.status !== "cancelled");
-  const vendors = useStore((s) => s.vendors);
+  const { vendors } = useCatalog();
   const active = orders.filter((o) => o.status !== "delivered");
   const byStatus = STATUS_FLOW.map((s) => ({ name: STATUS_LABEL[s].split(" ")[0], pedidos: orders.filter((o) => o.status === s).length }));
   const visit = vendors.map((v) => ({ v, items: active.flatMap((o) => o.items.filter((i) => i.vendorId === v.id)) })).filter((x) => x.items.length);
@@ -114,7 +116,7 @@ function Pedidos() {
   const q = useAllOrders();
   const orders = q.data ?? [];
   const m = useOrderMutations();
-  const vendors = useStore((s) => s.vendors);
+  const { vendors } = useCatalog();
   const [st, setSt] = useState("");
   const [sv, setSv] = useState("");
   const [date, setDate] = useState("");
@@ -169,14 +171,34 @@ function Pedidos() {
   );
 }
 
-function Productos() {
-  const products = useStore((s) => s.products);
-  const vendors = useStore((s) => s.vendors);
-  const [pct, setPct] = useState(5);
-  const patch = (id: string, p: object) => setState((s) => ({ products: s.products.map((x) => (x.id === id ? { ...x, ...p } : x)) }));
-  const bulk = (sign: 1 | -1) => { setState((s) => ({ products: s.products.map((x) => ({ ...x, price: Math.round(x.price * (1 + (sign * pct) / 100) * 2) / 2 })) })); toast.success(`Precios ${sign > 0 ? "subidos" : "bajados"} ${pct}%`); };
-  const add = () => setState((s) => ({ products: [...s.products, { id: `p-${Date.now()}`, name: "Nuevo producto", category: "hortalizas", vendorId: vendors[0].id, unit: "Saco de 50 kg", format: "Saco", weightKg: 50, price: 50, quality: "Primera", availability: "por_confirmar", desc: "Producto agregado por el operador.", emoji: "🥗" }] }));
+function ImgUpload({ kind, id, src, name }: { kind: "products" | "categories"; id: string; src: string | null; name: string }) {
+  const [busy, setBusy] = useState(false);
   return (
+    <label className="flex cursor-pointer items-center gap-2" title="Cambiar foto">
+      <Photo src={src} name={busy ? "Subiendo..." : "Sin foto"} className="h-12 w-12 text-[10px]" />
+      <input type="file" accept="image/*" className="hidden" onChange={async (e) => {
+        const f = e.target.files?.[0]; if (!f) return; setBusy(true);
+        const ok = await uploadImage(kind, id, f).catch(() => false); setBusy(false);
+        ok ? toast.success(`Foto de ${name} guardada`) : toast.error("No se pudo subir la foto");
+      }} />
+    </label>
+  );
+}
+
+const saveErr = () => toast.error("No se pudo guardar el cambio");
+
+function Productos() {
+  const { products, vendors, categories } = useCatalog();
+  const [pct, setPct] = useState(5);
+  const patch = (id: string, p: Partial<Product>) => patchProduct(id, p, saveErr);
+  const bulk = async (sign: 1 | -1) => { const ok = await bulkPrice(sign * pct); ok ? toast.success(`Precios ${sign > 0 ? "subidos" : "bajados"} ${pct}%`) : saveErr(); };
+  const add = async () => { if (!vendors[0]) return; (await addProduct(vendors[0].id)) ? toast.success("Producto agregado") : saveErr(); };
+  return (
+    <div className="space-y-4">
+    <Card className="space-y-2">
+      <p className="font-semibold">Fotos de categorías</p>
+      <div className="flex flex-wrap gap-3">{categories.map((c) => <div key={c.id} className="flex items-center gap-2 rounded-xl bg-muted p-2 text-sm"><ImgUpload kind="categories" id={c.id} src={c.image} name={c.name} />{c.name}</div>)}</div>
+    </Card>
     <Card className="space-y-3">
       <div className="flex flex-wrap items-center gap-2 rounded-xl bg-muted p-3 text-sm">
         <span className="font-semibold">Actualización masiva (04:00 am):</span>
@@ -186,38 +208,42 @@ function Productos() {
         <button className="ml-auto inline-flex h-9 items-center rounded-lg border bg-card px-3" onClick={add}><Plus className="mr-1 h-4 w-4" />Producto</button>
       </div>
       <div className="overflow-x-auto"><table className="w-full text-sm">
-        <thead className="text-left text-muted-foreground"><tr><th className="p-2">Producto</th><th className="p-2">Presentación</th><th className="p-2">Puesto</th><th className="p-2">Precio S/</th><th className="p-2">Disponibilidad</th><th /></tr></thead>
+        <thead className="text-left text-muted-foreground"><tr><th className="p-2">Foto</th><th className="p-2">Producto</th><th className="p-2">Presentación</th><th className="p-2">Categoría</th><th className="p-2">Puesto</th><th className="p-2">Precio S/</th><th className="p-2">Disponibilidad</th><th className="p-2">Visible</th><th /></tr></thead>
         <tbody>{products.map((p) => (
-          <tr key={p.id} className="border-t">
+          <tr key={p.id} className={`border-t ${p.active ? "" : "opacity-60"}`}>
+            <td className="p-2"><ImgUpload kind="products" id={p.id} src={p.image} name={p.name} /></td>
             <td className="p-2"><input className="h-9 w-48 rounded-lg border bg-card px-2" value={p.name} onChange={(e) => patch(p.id, { name: e.target.value })} /></td>
             <td className="p-2"><input className="h-9 w-40 rounded-lg border bg-card px-2" value={p.unit} onChange={(e) => patch(p.id, { unit: e.target.value })} /></td>
+            <td className="p-2"><select className="h-9 rounded-lg border bg-card px-2" value={p.category} onChange={(e) => patch(p.id, { category: e.target.value })}><option value="">Otros</option>{categories.map((c) => <option key={c.id} value={c.id}>{c.name.split(",")[0]}</option>)}</select></td>
             <td className="p-2"><select className="h-9 rounded-lg border bg-card px-2" value={p.vendorId} onChange={(e) => patch(p.id, { vendorId: e.target.value })}>{vendors.map((v) => <option key={v.id} value={v.id}>{v.stall}</option>)}</select></td>
             <td className="p-2"><input type="number" step="0.5" className="h-9 w-24 rounded-lg border bg-card px-2" value={p.price} onChange={(e) => patch(p.id, { price: +e.target.value })} /></td>
             <td className="p-2"><select className="h-9 rounded-lg border bg-card px-2" value={p.availability} onChange={(e) => patch(p.id, { availability: e.target.value as Availability })}><option value="disponible">Disponible hoy</option><option value="agotado">Agotado en Unicachi</option><option value="por_confirmar">Precio por confirmar</option></select></td>
-            <td className="p-2"><button aria-label="Eliminar" onClick={() => setState((s) => ({ products: s.products.filter((x) => x.id !== p.id) }))}><Trash2 className="h-4 w-4" /></button></td>
+            <td className="p-2"><input type="checkbox" className="h-5 w-5" checked={p.active} onChange={(e) => patch(p.id, { active: e.target.checked })} /></td>
+            <td className="p-2"><button aria-label="Eliminar" onClick={async () => { if (confirm(`¿Eliminar ${p.name}?`)) (await deleteProduct(p.id)) || saveErr(); }}><Trash2 className="h-4 w-4" /></button></td>
           </tr>
         ))}</tbody>
       </table></div>
     </Card>
+    </div>
   );
 }
 
 function Puestos() {
-  const vendors = useStore((s) => s.vendors);
-  const patch = (id: string, p: Partial<Vendor>) => setState((s) => ({ vendors: s.vendors.map((x) => (x.id === id ? { ...x, ...p } : x)) }));
-  const add = () => setState((s) => ({ vendors: [...s.vendors, { id: `v-${Date.now()}`, name: "Nuevo puesto", stall: "F-01", pavilion: "F", contact: "", phone: "", specialty: "", schedule: "03:00 am - 11:00 am", verified: false, active: true, notes: "", rating: 4.5 }] }));
+  const { vendors } = useCatalog();
+  const patch = (id: string, p: Partial<Vendor>) => patchVendor(id, p, saveErr);
+  const add = async () => { (await addVendor()) ? toast.success("Puesto agregado") : saveErr(); };
   return (
     <div className="space-y-3">
       <button className="inline-flex h-10 items-center rounded-xl bg-primary px-4 text-sm font-semibold text-primary-foreground" onClick={add}><Plus className="mr-1 h-4 w-4" />Nuevo puesto</button>
       <div className="grid gap-3 md:grid-cols-2">{vendors.map((v) => (
         <Card key={v.id} className={`grid grid-cols-2 gap-2 text-sm ${v.active ? "" : "opacity-60"}`}>
-          {([["name", "Nombre"], ["stall", "Número"], ["pavilion", "Pabellón"], ["contact", "Responsable"], ["phone", "Teléfono"], ["schedule", "Horario"], ["specialty", "Especialidad"], ["notes", "Notas internas"]] as const).map(([k, l]) => (
-            <label key={k} className={k === "specialty" || k === "notes" ? "col-span-2" : ""}><span className="text-xs text-muted-foreground">{l}</span><input className="h-9 w-full rounded-lg border bg-card px-2" value={v[k]} onChange={(e) => patch(v.id, { [k]: e.target.value })} /></label>
+          {([["name", "Nombre"], ["stall", "Número"], ["pavilion", "Pabellón"], ["contact", "Responsable"], ["phone", "Teléfono"], ["schedule", "Horario"], ["specialty", "Especialidad"]] as const).map(([k, l]) => (
+            <label key={k} className={k === "specialty" ? "col-span-2" : ""}><span className="text-xs text-muted-foreground">{l}</span><input className="h-9 w-full rounded-lg border bg-card px-2" value={v[k]} onChange={(e) => patch(v.id, { [k]: e.target.value })} /></label>
           ))}
           <div className="col-span-2 flex gap-2">
             <button className="inline-flex h-9 items-center rounded-lg border px-3" onClick={() => patch(v.id, { active: !v.active })}>{v.active ? <><Pause className="mr-1 h-4 w-4" />Pausar</> : <><Play className="mr-1 h-4 w-4" />Activar</>}</button>
             <button className="inline-flex h-9 items-center rounded-lg border px-3" onClick={() => patch(v.id, { verified: !v.verified })}>{v.verified ? "Quitar verificado" : "Verificar"}</button>
-            <button className="ml-auto inline-flex h-9 items-center rounded-lg border px-3 text-destructive" onClick={() => setState((s) => ({ vendors: s.vendors.filter((x) => x.id !== v.id) }))}><Trash2 className="h-4 w-4" /></button>
+            <button className="ml-auto inline-flex h-9 items-center rounded-lg border px-3 text-destructive" onClick={async () => { if (confirm(`¿Eliminar ${v.name} y sus productos?`)) (await deleteVendor(v.id)) || saveErr(); }}><Trash2 className="h-4 w-4" /></button>
           </div>
         </Card>
       ))}</div>
@@ -226,8 +252,8 @@ function Puestos() {
 }
 
 function Tarifas() {
-  const t = useStore((s) => s.tariffs);
-  const set = (p: Partial<typeof t>) => setState((s) => ({ tariffs: { ...s.tariffs, ...p } }));
+  const t = useCatalog().tariffs;
+  const set = (p: Partial<typeof t>) => patchSettings(p, saveErr);
   return (
     <div className="space-y-4">
       <Card className="grid gap-3 md:grid-cols-3">

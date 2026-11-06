@@ -3,7 +3,8 @@ import { useState } from "react";
 import { CheckCircle2, ImageUp, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { ZONES, waLink } from "@/lib/data";
-import { useStore, type CustomRequest } from "@/lib/store";
+import { type CustomRequest } from "@/lib/store";
+import { useCatalog } from "@/lib/catalog";
 import { submitRequest } from "@/lib/requests";
 import { Button } from "@/components/ui/button";
 import { Card, Field, inputCls, requireFields } from "@/components/Field";
@@ -26,7 +27,7 @@ const empty = (vendor = ""): Row => ({ name: "", qty: "1", unit: "Saco", quality
 
 function Solicitud() {
   const { vendor } = Route.useSearch();
-  const vendors = useStore((s) => s.vendors);
+  const vendors = useCatalog().vendors.filter((v) => v.active);
   const [mode, setMode] = useState<"lista" | "foto">("lista");
   const [rows, setRows] = useState<Row[]>([empty(vendor)]);
   const [file, setFile] = useState<{ name: string; url?: string; raw: File } | null>(null);

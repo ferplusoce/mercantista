@@ -1,8 +1,9 @@
+import { useCatalog } from "@/lib/catalog";
 import { useState } from "react";
 import { Camera, Check, Pencil } from "lucide-react";
 import { toast } from "sonner";
 import { soles } from "@/lib/data";
-import { useStore, type Order } from "@/lib/store";
+import { type Order } from "@/lib/store";
 import { responseMinutes, useOrderPhotos, usePhotoActions } from "@/lib/photos";
 
 const STATUS_TXT = { pendiente: "Esperando al cliente", aprobado: "Aprobado", cambiar: "Pide cambio" } as const;
@@ -11,7 +12,7 @@ const STATUS_TXT = { pendiente: "Esperando al cliente", aprobado: "Aprobado", ca
 export function AdminPhotos({ o }: { o: Order }) {
   const { data: photos = [] } = useOrderPhotos(o.code);
   const act = usePhotoActions(o.code);
-  const vendors = useStore((s) => s.vendors);
+  const vendors = useCatalog().vendors;
   const [busy, setBusy] = useState<number | null>(null);
   const [prices, setPrices] = useState<Record<number, string>>({});
   const approved = photos.filter((p) => p.status === "aprobado").length;
@@ -66,7 +67,7 @@ export function AdminPhotos({ o }: { o: Order }) {
 export function ClientPhotos({ o }: { o: Order }) {
   const { data: photos = [] } = useOrderPhotos(o.code);
   const act = usePhotoActions(o.code);
-  const vendors = useStore((s) => s.vendors);
+  const vendors = useCatalog().vendors;
   const [changing, setChanging] = useState<number | null>(null);
   const [comment, setComment] = useState("");
   const [busy, setBusy] = useState(false);

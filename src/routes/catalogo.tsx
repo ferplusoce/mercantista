@@ -1,8 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { SearchX } from "lucide-react";
-import { CATEGORIES, FORMATS, type Category } from "@/lib/data";
-import { useStore } from "@/lib/store";
+import { FORMATS, type Category } from "@/lib/data";
+import { useCatalog } from "@/lib/catalog";
 import { PriceNote, ProductCard } from "@/components/ProductCard";
 import { Switch } from "@/components/ui/switch";
 
@@ -24,8 +24,8 @@ const sel = "h-11 rounded-xl border bg-card px-3 text-sm";
 
 function Catalogo() {
   const s = Route.useSearch();
-  const products = useStore((x) => x.products);
-  const vendors = useStore((x) => x.vendors);
+  const { products, vendors: allVendors, categories, loaded } = useCatalog();
+  const vendors = allVendors.filter((v) => v.active);
   const [q, setQ] = useState(s.q ?? "");
   const [cat, setCat] = useState<string>(s.cat ?? "");
   const [vendor, setVendor] = useState(s.vendor ?? "");
@@ -35,7 +35,7 @@ function Catalogo() {
   const [sort, setSort] = useState("rel");
 
   const list = useMemo(() => {
-    const r = products.filter((p) => (!q || p.name.toLowerCase().includes(q.toLowerCase())) && (!cat || p.category === cat) && (!vendor || p.vendorId === vendor) && (!format || p.format === format) && p.price <= max && (!onlyStock || p.availability === "disponible"));
+    const r = products.filter((p) => p.active && (!q || p.name.toLowerCase().includes(q.toLowerCase())) && (!cat || p.category === cat) && (!vendor || p.vendorId === vendor) && (!format || p.format === format) && p.price <= max && (!onlyStock || p.availability === "disponible"));
     if (sort === "asc") r.sort((a, b) => a.price - b.price);
     if (sort === "desc") r.sort((a, b) => b.price - a.price);
     return r;
@@ -47,7 +47,7 @@ function Catalogo() {
       <PriceNote />
       <div className="grid gap-2 rounded-2xl border bg-card p-3 shadow-sm sm:grid-cols-2 lg:grid-cols-6">
         <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Buscar producto…" className={sel + " lg:col-span-2"} />
-        <select value={cat} onChange={(e) => setCat(e.target.value)} className={sel}><option value="">Todo tipo</option>{CATEGORIES.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}<option value="abarrotes">Abarrotes</option></select>
+        <select value={cat} onChange={(e) => setCat(e.target.value)} className={sel}><option value="">Todo tipo</option>{categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}</select>
         <select value={vendor} onChange={(e) => setVendor(e.target.value)} className={sel}><option value="">Todos los puestos</option>{vendors.map((v) => <option key={v.id} value={v.id}>{v.stall} · {v.name}</option>)}</select>
         <select value={format} onChange={(e) => setFormat(e.target.value)} className={sel}><option value="">Todo formato</option>{FORMATS.map((f) => <option key={f}>{f}</option>)}</select>
         <select value={sort} onChange={(e) => setSort(e.target.value)} className={sel}><option value="rel">Relevancia</option><option value="asc">Precio: menor</option><option value="desc">Precio: mayor</option></select>
@@ -55,7 +55,7 @@ function Catalogo() {
         <label className="flex items-center gap-2 text-sm lg:col-span-3"><Switch checked={onlyStock} onCheckedChange={setOnlyStock} />Solo stock confirmado hoy</label>
       </div>
       <p className="text-sm text-muted-foreground">{list.length} productos</p>
-      {list.length === 0 ? (
+      {!loaded ? <p className="p-10 text-center text-muted-foreground">Cargando catálogo...</p> : list.length === 0 ? (
         <div className="rounded-2xl border bg-card p-10 text-center"><SearchX className="mx-auto h-10 w-10 text-muted-foreground" /><p className="mt-2 font-semibold">No encontramos productos con esos filtros</p><p className="text-sm text-muted-foreground">Prueba otros filtros o envíanos una solicitud personalizada.</p></div>
       ) : (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">{list.map((p) => <ProductCard key={p.id} p={p} />)}</div>

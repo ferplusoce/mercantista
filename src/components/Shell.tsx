@@ -2,7 +2,7 @@ import { Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { Home, LayoutGrid, MapPin, PackageSearch, Search, ShoppingBag, Store, User, ClipboardList, Leaf } from "lucide-react";
 import { useStore } from "@/lib/store";
-import { PRODUCTS, VENDORS } from "@/lib/data";
+import { useCatalog } from "@/lib/catalog";
 import { WelcomeDialog } from "@/components/Welcome";
 
 export function Logo() {
@@ -17,10 +17,11 @@ export function Logo() {
 function SearchBox() {
   const [q, setQ] = useState("");
   const nav = useNavigate();
+  const cat = useCatalog();
   const term = q.trim().toLowerCase();
   const hits = term.length < 2 ? [] : [
-    ...PRODUCTS.filter((p) => p.name.toLowerCase().includes(term)).slice(0, 5).map((p) => ({ label: p.name, sub: "Producto", go: () => nav({ to: "/catalogo", search: { q: p.name } }) })),
-    ...VENDORS.filter((v) => (v.name + v.stall).toLowerCase().includes(term)).slice(0, 3).map((v) => ({ label: v.name, sub: `Puesto ${v.stall}`, go: () => nav({ to: "/puestos/$id", params: { id: v.id } }) })),
+    ...cat.products.filter((p) => p.name.toLowerCase().includes(term)).slice(0, 5).map((p) => ({ label: p.name, sub: "Producto", go: () => nav({ to: "/catalogo", search: { q: p.name } }) })),
+    ...cat.vendors.filter((v) => (v.name + v.stall).toLowerCase().includes(term)).slice(0, 3).map((v) => ({ label: v.name, sub: `Puesto ${v.stall}`, go: () => nav({ to: "/puestos/$id", params: { id: v.id } }) })),
   ];
   return (
     <div className="relative w-full">

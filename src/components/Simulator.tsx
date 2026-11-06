@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { ZONES, soles } from "@/lib/data";
 import { vanFee, taxiFee } from "@/lib/pricing";
-import { useStore } from "@/lib/store";
+import { useCatalog } from "@/lib/catalog";
 
 export function Simulator() {
-  const t = useStore((s) => s.tariffs);
+  const t = useCatalog().tariffs;
   const [zone, setZone] = useState<string>(ZONES[0]);
   const [kg, setKg] = useState(250);
   const m = vanFee({ zone, kg }, t);
