@@ -21,7 +21,8 @@ export async function submitRequest(input: z.input<typeof requestSchema>, file?:
     if (error) throw new Error("No se pudo subir el archivo");
   }
   const code = `SOL-${id}`;
-  const { error } = await supabase.from("requests").insert({ ...data, code, attachment_path: path, attachment_name: file?.name ?? null });
+  const { data: auth } = await supabase.auth.getUser();
+  const { error } = await supabase.from("requests").insert({ ...data, user_id: auth.user?.id ?? null, code, attachment_path: path, attachment_name: file?.name ?? null });
   if (error) throw new Error("No se pudo guardar la solicitud");
   return code;
 }
