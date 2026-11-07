@@ -8,6 +8,7 @@ import { createOrder } from "@/lib/orders";
 import { markOrderSent } from "@/lib/opinions";
 import { OpinionForm } from "@/components/OpinionForm";
 import { useCatalog } from "@/lib/catalog";
+import { useAccount, useSession } from "@/lib/account";
 import { cartSummary, clearCart, setState, useStore, type Order } from "@/lib/store";
 import { Card, Field, inputCls, requireFields } from "@/components/Field";
 
@@ -29,7 +30,9 @@ const METHODS = ["Yape / Plin", "Transferencia BCP / BBVA / Interbank", "Efectiv
 function Checkout() {
   const cart = useStore((s) => s.cart);
   const { products, vendors, tariffs: t } = useCatalog();
-  const profile = useStore((s) => s.profile);
+  const { user, loading: authLoading } = useSession();
+  const acc = useAccount(user?.id).data;
+  const profile = { business: acc?.profile.business_name ?? "", owner: acc?.profile.owner_name ?? "", phone: acc?.profile.phone ?? "", doc: acc?.profile.doc_number ?? "", addresses: acc?.addresses ?? [], taxis: acc?.taxis ?? [] };
   const sum = cartSummary(cart, products);
   const [service, setService] = useState<Order["service"]>("minivan_delivery");
   const [f, setF] = useState<Record<string, string>>({ business: "", contact: "", phone: "", date: new Date(Date.now() + 864e5).toISOString().slice(0, 10), slot: SLOTS[0], zone: ZONES[0], address: "", driver: "", plate: "", dphone: "", arrival: "05:00", meeting: "Puerta 2", plan: PLANS[0], method: METHODS[0], doc: "", razon: "", billAddr: "" });
@@ -39,6 +42,13 @@ function Checkout() {
   const set = (k: string) => (e: { target: { value: string } }) => setF({ ...f, [k]: e.target.value });
 
   if (done) return <Success o={done} />;
+  if (!authLoading && !user && sum.lines.length) return (
+    <div className="mx-auto max-w-md space-y-3 rounded-2xl border bg-card p-8 text-center">
+      <h1 className="text-2xl font-bold">Ingresa para hacer tu pedido</h1>
+      <p>Tu carrito se guarda. Solo necesitas tu celular y una contraseña.</p>
+      <Link to="/ingresar" search={{ redirect: "/checkout" }} className="inline-flex h-12 w-full items-center justify-center rounded-xl bg-primary text-lg font-bold text-primary-foreground">Ingresar o crear cuenta</Link>
+    </div>
+  );
   if (!sum.lines.length) return <div className="rounded-2xl border bg-card p-10 text-center"><p className="font-semibold">No hay productos en tu pedido.</p><Link to="/catalogo" className="mt-3 inline-block text-primary">Ir al catálogo →</Link></div>;
 
   const mv = vanFee({ zone: f.zone, kg: sum.weightKg }, t);
@@ -88,7 +98,7 @@ function Checkout() {
 
         <Card className="grid gap-3 md:grid-cols-2">
           <h2 className="font-bold md:col-span-2">Datos del negocio</h2>
-          <div className="md:col-span-2">{profile.business && <button className="text-sm text-primary" onClick={() => setF({ ...f, business: profile.business, contact: profile.owner, phone: profile.phone, address: profile.addresses[0]?.line ?? "", doc: profile.doc })}>Usar datos de mi cuenta ({profile.business})</button>}</div>
+          <div className="md:col-span-2">{profile.business && <button className="text-sm text-primary" onClick={() => setF({ ...f, business: profile.business, contact: profile.owner, phone: profile.phone, address: profile.addresses[0]?.line ?? "", zone: profile.addresses[0]?.zone ?? f.zone, doc: profile.doc })}>Usar datos de mi cuenta ({profile.business})</button>}</div>
           <Field label="Bodega / negocio" required error={err.business}><input className={inputCls} value={f.business} onChange={set("business")} /></Field>
           <Field label="Responsable" required error={err.contact}><input className={inputCls} value={f.contact} onChange={set("contact")} /></Field>
           <Field label="Celular / WhatsApp" required error={err.phone}><input className={inputCls} inputMode="tel" value={f.phone} onChange={set("phone")} /></Field>
