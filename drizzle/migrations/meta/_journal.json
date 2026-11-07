@@ -50,6 +50,13 @@
       "when": 1793735155414,
       "tag": "0006_catalog_tables",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1794014319045,
+      "tag": "0007_user_accounts",
+      "breakpoints": true
     }
   ]
 }
