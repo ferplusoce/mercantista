@@ -12,5 +12,6 @@
 - Store custom requests and private attachments through the browser Cloud client with bounded anonymous INSERT and admin-only SELECT/UPDATE policies, so anonymous submission never exposes customer lists.
 - Normalize opinion delivery types only at reporting/export boundaries, retaining raw historical answers and keeping existing KPIs unchanged.
 - Reuse HowItWorks in home and the first-visit welcome; only the welcome-seen flag belongs in browser storage.
-- Catalog (categories, vendors, products) and settings (tariffs, support WhatsApp) live in Cloud and are read through `src/lib/catalog.ts`; localStorage holds only cart/profile/device data, so admin edits reach every customer.
+- Catalog (categories, vendors, products) and settings (tariffs, support WhatsApp) live in Cloud and are read through `src/lib/catalog.ts`; localStorage holds only cart and device data, so admin edits reach every customer.
 - Product/category photos live in the private `product-images` bucket (public buckets are blocked by workspace policy); `image_url` stores the storage path and the app resolves signed URLs; uploads are shrunk client-side to ≤640px WebP for low-end phones.
+- Customer accounts use Cloud Auth email/password with a synthetic email `<celular>@clientes.mercantista.pe` (auto-confirm on, no SMS); profile/addresses/taxis are per-user tables with own-row RLS (admin sees all), and `create_order` requires a session and stamps `user_id`.
