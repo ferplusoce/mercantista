@@ -14,17 +14,15 @@ export type Order = {
   history: { status: OrderStatus; at: string }[];
 };
 export type CustomRequest = { code: string; createdAt: string; business: string; contact: string; phone: string; address: string; date: string; items: { name: string; qty: string; unit: string; quality: string; vendor: string; notes: string }[]; attachment?: string; status: "pending" | "quoted" | "approved" | "rejected" };
-export type Profile = { business: string; owner: string; phone: string; doc: string; addresses: { zone: string; line: string; ref: string }[]; taxis: { driver: string; plate: string; phone: string }[] };
 export type Cost = { date: string; fuel: number; driver: number; maintenance: number; other: number };
 
-type State = { cart: CartItem[]; orders: Order[]; requests: CustomRequest[]; profile: Profile; costs: Cost[] };
+type State = { cart: CartItem[]; orders: Order[]; requests: CustomRequest[]; costs: Cost[] };
 
 const today = new Date().toISOString().slice(0, 10);
 const initial = (): State => ({
   cart: [],
   orders: [], // copia local de los pedidos hechos desde este dispositivo
   requests: [],
-  profile: { business: "Bodega Don Pepe", owner: "José Ramírez", phone: "999111222", doc: "10456789123", addresses: [{ zone: "Lurín Cercado", line: "Av. Principal 123", ref: "Frente al parque, portón verde" }], taxis: [{ driver: "Pedro Salas", plate: "ABC-123", phone: "988777666" }] },
   costs: Array.from({ length: 7 }, (_, i) => { const d = new Date(); d.setDate(d.getDate() - 6 + i); return { date: d.toISOString().slice(5, 10), fuel: 60 + (i % 3) * 8, driver: 70, maintenance: 15, other: 10 }; }),
 });
 
@@ -35,7 +33,7 @@ const listeners = new Set<() => void>();
 function load() {
   if (loaded || typeof window === "undefined") return;
   loaded = true;
-  try { const raw = localStorage.getItem(KEY); if (raw) { const { products: _p, vendors: _v, tariffs: _t, ...rest } = JSON.parse(raw); state = { ...state, ...rest }; } } catch { /* ignore */ }
+  try { const raw = localStorage.getItem(KEY); if (raw) { const { products: _p, vendors: _v, tariffs: _t, profile: _pr, ...rest } = JSON.parse(raw); state = { ...state, ...rest }; } } catch { /* ignore */ }
 }
 export function setState(fn: (s: State) => Partial<State>) {
   load();

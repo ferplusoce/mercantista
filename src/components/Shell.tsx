@@ -43,7 +43,7 @@ function SearchBox() {
 
 export function Header() {
   const count = useStore((s) => s.cart.reduce((n, c) => n + c.qty, 0));
-  const links = [["/catalogo", "Catálogo"], ["/puestos", "Puestos"], ["/servicios", "Servicios y tarifas"], ["/seguimiento", "Seguimiento"], ["/admin", "Panel"]] as const;
+  const links = [["/catalogo", "Catálogo"], ["/puestos", "Puestos"], ["/servicios", "Servicios y tarifas"], ["/mis-pedidos", "Mis pedidos"], ["/seguimiento", "Seguimiento"], ["/admin", "Panel"]] as const;
   return (
     <header className="sticky top-0 z-40 border-b bg-background/90 backdrop-blur">
       <div className="bg-foreground px-4 py-1.5 text-center text-xs text-background">
@@ -69,7 +69,7 @@ export function Header() {
 }
 
 export function MobileNav() {
-  const items = [["/", Home, "Inicio"], ["/catalogo", LayoutGrid, "Catálogo"], ["/puestos", Store, "Puestos"], ["/seguimiento", PackageSearch, "Pedidos"], ["/cuenta", User, "Cuenta"]] as const;
+  const items = [["/", Home, "Inicio"], ["/catalogo", LayoutGrid, "Catálogo"], ["/puestos", Store, "Puestos"], ["/mis-pedidos", PackageSearch, "Mis pedidos"], ["/cuenta", User, "Cuenta"]] as const;
   return (
     <nav className="fixed inset-x-0 bottom-0 z-40 grid grid-cols-5 border-t bg-card pb-[env(safe-area-inset-bottom)] md:hidden">
       {items.map(([to, Icon, l]) => (
