@@ -35,7 +35,7 @@ function MisPedidos() {
   const repeat = (items: { productId: string; qty: number }[]) => {
     const ok = items.filter((i) => products.some((p) => p.id === i.productId && p.active));
     ok.forEach((i) => addToCart(i.productId, i.qty));
-    if (!ok.length) return toast.error("Esos productos ya no están en el catálogo");
+    if (!ok.length) { toast.error("Esos productos ya no están en el catálogo"); return; }
     toast.success(ok.length < items.length ? "Agregamos los productos que siguen en el catálogo" : "Productos agregados a tu pedido");
     nav({ to: "/carrito" });
   };

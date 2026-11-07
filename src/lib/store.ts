@@ -14,7 +14,6 @@ export type Order = {
   history: { status: OrderStatus; at: string }[];
 };
 export type CustomRequest = { code: string; createdAt: string; business: string; contact: string; phone: string; address: string; date: string; items: { name: string; qty: string; unit: string; quality: string; vendor: string; notes: string }[]; attachment?: string; status: "pending" | "quoted" | "approved" | "rejected" };
-export type Profile = { business: string; owner: string; phone: string; doc: string; addresses: { zone: string; line: string; ref: string }[]; taxis: { driver: string; plate: string; phone: string }[] };
 export type Cost = { date: string; fuel: number; driver: number; maintenance: number; other: number };
 
 type State = { cart: CartItem[]; orders: Order[]; requests: CustomRequest[]; costs: Cost[] };
