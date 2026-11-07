@@ -15,6 +15,8 @@ import { Route as CarritoRouteImport } from './routes/carrito'
 import { Route as CatalogoRouteImport } from './routes/catalogo'
 import { Route as CheckoutRouteImport } from './routes/checkout'
 import { Route as CuentaRouteImport } from './routes/cuenta'
+import { Route as IngresarRouteImport } from './routes/ingresar'
+import { Route as MisPedidosRouteImport } from './routes/mis-pedidos'
 import { Route as OpinionRouteImport } from './routes/opinion'
 import { Route as SeguimientoRouteImport } from './routes/seguimiento'
 import { Route as ServiciosRouteImport } from './routes/servicios'
@@ -50,6 +52,16 @@ const CheckoutRoute = CheckoutRouteImport.update({
 const CuentaRoute = CuentaRouteImport.update({
   id: '/cuenta',
   path: '/cuenta',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IngresarRoute = IngresarRouteImport.update({
+  id: '/ingresar',
+  path: '/ingresar',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MisPedidosRoute = MisPedidosRouteImport.update({
+  id: '/mis-pedidos',
+  path: '/mis-pedidos',
   getParentRoute: () => rootRouteImport,
 } as any)
 const OpinionRoute = OpinionRouteImport.update({
@@ -90,6 +102,8 @@ export interface FileRoutesByFullPath {
   '/catalogo': typeof CatalogoRoute
   '/checkout': typeof CheckoutRoute
   '/cuenta': typeof CuentaRoute
+  '/ingresar': typeof IngresarRoute
+  '/mis-pedidos': typeof MisPedidosRoute
   '/opinion': typeof OpinionRoute
   '/seguimiento': typeof SeguimientoRoute
   '/servicios': typeof ServiciosRoute
@@ -104,6 +118,8 @@ export interface FileRoutesByTo {
   '/catalogo': typeof CatalogoRoute
   '/checkout': typeof CheckoutRoute
   '/cuenta': typeof CuentaRoute
+  '/ingresar': typeof IngresarRoute
+  '/mis-pedidos': typeof MisPedidosRoute
   '/opinion': typeof OpinionRoute
   '/seguimiento': typeof SeguimientoRoute
   '/servicios': typeof ServiciosRoute
@@ -119,6 +135,8 @@ export interface FileRoutesById {
   '/catalogo': typeof CatalogoRoute
   '/checkout': typeof CheckoutRoute
   '/cuenta': typeof CuentaRoute
+  '/ingresar': typeof IngresarRoute
+  '/mis-pedidos': typeof MisPedidosRoute
   '/opinion': typeof OpinionRoute
   '/seguimiento': typeof SeguimientoRoute
   '/servicios': typeof ServiciosRoute
@@ -135,6 +153,8 @@ export interface FileRouteTypes {
     | '/catalogo'
     | '/checkout'
     | '/cuenta'
+    | '/ingresar'
+    | '/mis-pedidos'
     | '/opinion'
     | '/seguimiento'
     | '/servicios'
@@ -149,6 +169,8 @@ export interface FileRouteTypes {
     | '/catalogo'
     | '/checkout'
     | '/cuenta'
+    | '/ingresar'
+    | '/mis-pedidos'
     | '/opinion'
     | '/seguimiento'
     | '/servicios'
@@ -163,6 +185,8 @@ export interface FileRouteTypes {
     | '/catalogo'
     | '/checkout'
     | '/cuenta'
+    | '/ingresar'
+    | '/mis-pedidos'
     | '/opinion'
     | '/seguimiento'
     | '/servicios'
@@ -178,6 +202,8 @@ export interface RootRouteChildren {
   CatalogoRoute: typeof CatalogoRoute
   CheckoutRoute: typeof CheckoutRoute
   CuentaRoute: typeof CuentaRoute
+  IngresarRoute: typeof IngresarRoute
+  MisPedidosRoute: typeof MisPedidosRoute
   OpinionRoute: typeof OpinionRoute
   SeguimientoRoute: typeof SeguimientoRoute
   ServiciosRoute: typeof ServiciosRoute
@@ -228,6 +254,20 @@ declare module '@tanstack/react-router' {
       path: '/cuenta'
       fullPath: '/cuenta'
       preLoaderRoute: typeof CuentaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ingresar': {
+      id: '/ingresar'
+      path: '/ingresar'
+      fullPath: '/ingresar'
+      preLoaderRoute: typeof IngresarRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mis-pedidos': {
+      id: '/mis-pedidos'
+      path: '/mis-pedidos'
+      fullPath: '/mis-pedidos'
+      preLoaderRoute: typeof MisPedidosRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/opinion': {
@@ -282,6 +322,8 @@ const rootRouteChildren: RootRouteChildren = {
   CatalogoRoute: CatalogoRoute,
   CheckoutRoute: CheckoutRoute,
   CuentaRoute: CuentaRoute,
+  IngresarRoute: IngresarRoute,
+  MisPedidosRoute: MisPedidosRoute,
   OpinionRoute: OpinionRoute,
   SeguimientoRoute: SeguimientoRoute,
   ServiciosRoute: ServiciosRoute,

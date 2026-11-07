@@ -43,7 +43,7 @@ function SearchBox() {
 
 export function Header() {
   const count = useStore((s) => s.cart.reduce((n, c) => n + c.qty, 0));
-  const links = [["/catalogo", "Catálogo"], ["/puestos", "Puestos"], ["/servicios", "Servicios y tarifas"], ["/seguimiento", "Seguimiento"], ["/admin", "Panel"]] as const;
+  const links = [["/catalogo", "Catálogo"], ["/puestos", "Puestos"], ["/servicios", "Servicios y tarifas"], ["/mis-pedidos", "Mis pedidos"], ["/seguimiento", "Seguimiento"], ["/admin", "Panel"]] as const;
   return (
     <header className="sticky top-0 z-40 border-b bg-background/90 backdrop-blur">
       <div className="bg-foreground px-4 py-1.5 text-center text-xs text-background">
