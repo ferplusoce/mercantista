@@ -1,8 +1,10 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
+import { z } from "zod";
 import { Card, Field, inputCls } from "@/components/Field";
-import { signIn, signUp, validateCredentials } from "@/lib/account";
+import { signIn, signUp } from "@/lib/account";
+import { businessSchema, passwordSchema, personNameSchema, phoneSchema, zodFieldErrors } from "@/lib/validators";
 
 type S = { redirect?: string };
 export const Route = createFileRoute("/ingresar")({
@@ -23,36 +25,41 @@ function Ingresar() {
   const nav = useNavigate();
   const [mode, setMode] = useState<"in" | "up">("in");
   const [f, setF] = useState({ phone: "", password: "", business: "", owner: "" });
-  const [err, setErr] = useState("");
+  const [err, setErr] = useState<Record<string, string>>({});
+  const [formErr, setFormErr] = useState("");
   const [busy, setBusy] = useState(false);
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const v = validateCredentials(f.phone, f.password);
-    if (v) return setErr(v);
-    if (mode === "up" && !f.business.trim()) return setErr("Escribe el nombre de tu bodega");
-    setErr(""); setBusy(true);
+    const schema = z.object({
+      phone: phoneSchema,
+      password: passwordSchema,
+      ...(mode === "up" ? { business: businessSchema, owner: personNameSchema } : {}),
+    });
+    const r = schema.safeParse(f);
+    if (!r.success) { setErr(zodFieldErrors(r.error)); return; }
+    setErr({}); setFormErr(""); setBusy(true);
     try {
       if (mode === "in") await signIn(f.phone, f.password); else await signUp(f.phone, f.password, f.business.trim(), f.owner.trim());
       toast.success(mode === "in" ? "¡Bienvenido!" : "¡Cuenta creada!");
       nav({ to: redirect ?? "/mis-pedidos", replace: true });
-    } catch (x) { setErr((x as Error).message); } finally { setBusy(false); }
+    } catch (x) { setFormErr((x as Error).message); } finally { setBusy(false); }
   };
   const big = inputCls + " h-14 text-lg";
   return (
     <div className="mx-auto max-w-md space-y-4">
       <h1 className="text-3xl font-bold">{mode === "in" ? "Ingresa" : "Crea tu cuenta"}</h1>
       <div className="grid grid-cols-2 gap-2">
-        {(["in", "up"] as const).map((m) => <button key={m} type="button" onClick={() => { setMode(m); setErr(""); }} className={`h-12 rounded-xl border text-base font-semibold ${mode === m ? "bg-primary text-primary-foreground" : "bg-card"}`}>{m === "in" ? "Ya tengo cuenta" : "Soy nuevo"}</button>)}
+        {(["in", "up"] as const).map((m) => <button key={m} type="button" onClick={() => { setMode(m); setErr({}); setFormErr(""); }} className={`h-12 rounded-xl border text-base font-semibold ${mode === m ? "bg-primary text-primary-foreground" : "bg-card"}`}>{m === "in" ? "Ya tengo cuenta" : "Soy nuevo"}</button>)}
       </div>
       <Card>
         <form onSubmit={submit} className="space-y-3">
-          <Field label="Celular"><input className={big} inputMode="numeric" autoComplete="tel" maxLength={9} placeholder="9XXXXXXXX" value={f.phone} onChange={(e) => setF({ ...f, phone: e.target.value.replace(/\D/g, "") })} /></Field>
-          <Field label="Contraseña (mínimo 6)"><input className={big} type="password" autoComplete={mode === "in" ? "current-password" : "new-password"} value={f.password} onChange={(e) => setF({ ...f, password: e.target.value })} /></Field>
+          <Field label="Celular" error={err.phone}><input className={big} inputMode="numeric" autoComplete="tel" maxLength={9} placeholder="9XXXXXXXX" value={f.phone} onChange={(e) => setF({ ...f, phone: e.target.value.replace(/\D/g, "") })} /></Field>
+          <Field label="Contraseña (mínimo 6)" error={err.password}><input className={big} type="password" autoComplete={mode === "in" ? "current-password" : "new-password"} value={f.password} onChange={(e) => setF({ ...f, password: e.target.value })} /></Field>
           {mode === "up" && <>
-            <Field label="Nombre de tu bodega"><input className={big} value={f.business} onChange={(e) => setF({ ...f, business: e.target.value })} /></Field>
-            <Field label="Tu nombre"><input className={big} value={f.owner} onChange={(e) => setF({ ...f, owner: e.target.value })} /></Field>
+            <Field label="Nombre de tu bodega" error={err.business}><input className={big} value={f.business} onChange={(e) => setF({ ...f, business: e.target.value })} /></Field>
+            <Field label="Tu nombre" error={err.owner}><input className={big} value={f.owner} onChange={(e) => setF({ ...f, owner: e.target.value })} /></Field>
           </>}
-          {err && <p role="alert" className="text-sm font-medium text-destructive">{err}</p>}
+          {formErr && <p role="alert" className="text-sm font-medium text-destructive">{formErr}</p>}
           <button disabled={busy} className="h-14 w-full rounded-xl bg-primary text-lg font-bold text-primary-foreground disabled:opacity-50">{busy ? "Un momento..." : mode === "in" ? "Ingresar" : "Crear cuenta"}</button>
         </form>
       </Card>

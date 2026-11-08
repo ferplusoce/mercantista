@@ -9,8 +9,10 @@ import { markOrderSent } from "@/lib/opinions";
 import { OpinionForm } from "@/components/OpinionForm";
 import { useCatalog } from "@/lib/catalog";
 import { useAccount, useSession } from "@/lib/account";
+import { z } from "zod";
 import { cartSummary, clearCart, setState, useStore, type Order } from "@/lib/store";
-import { Card, Field, inputCls, requireFields } from "@/components/Field";
+import { Card, Field, inputCls } from "@/components/Field";
+import { addressSchema, businessSchema, deliveryDateError, docSchema, formatPlate, onlyDigits, personNameSchema, phoneSchema, plateSchema, zodFieldErrors } from "@/lib/validators";
 
 export const Route = createFileRoute("/checkout")({
   head: () => ({ meta: [
@@ -35,7 +37,7 @@ function Checkout() {
   const profile = { business: acc?.profile.business_name ?? "", owner: acc?.profile.owner_name ?? "", phone: acc?.profile.phone ?? "", doc: acc?.profile.doc_number ?? "", addresses: acc?.addresses ?? [], taxis: acc?.taxis ?? [] };
   const sum = cartSummary(cart, products);
   const [service, setService] = useState<Order["service"]>("minivan_delivery");
-  const [f, setF] = useState<Record<string, string>>({ business: "", contact: "", phone: "", date: new Date(Date.now() + 864e5).toISOString().slice(0, 10), slot: SLOTS[0], zone: ZONES[0], address: "", driver: "", plate: "", dphone: "", arrival: "05:00", meeting: "Puerta 2", plan: PLANS[0], method: METHODS[0], doc: "", razon: "", billAddr: "" });
+  const [f, setF] = useState<Record<string, string>>({ business: "", contact: "", phone: "", date: new Date(Date.now() + 864e5).toISOString().slice(0, 10), slot: SLOTS[0], zone: ZONES[0], address: "", driver: "", plate: "", dphone: "", arrival: "05:00", meeting: "Puerta 2", plan: PLANS[0], method: METHODS[0], docType: "DNI", doc: "", razon: "", billAddr: "" });
   const [err, setErr] = useState<Record<string, string>>({});
   const [done, setDone] = useState<Order | null>(null);
   const [saving, setSaving] = useState(false);
@@ -57,13 +59,23 @@ function Checkout() {
   const total = sum.subtotal + serviceFee + shippingFee;
 
   const confirm = async () => {
-    const keys = ["business", "contact", "phone", "date", ...(service === "taxi_delivery" ? ["driver", "plate", "dphone", "arrival", "meeting"] : ["address"])];
-    const e = requireFields(f, keys);
-    if (f.dphone && !/^9\d{8}$/.test(f.dphone)) e.dphone = "Celular de 9 dígitos";
+    const schema = z.object({
+      business: businessSchema,
+      contact: personNameSchema,
+      phone: phoneSchema,
+      ...(service === "taxi_delivery"
+        ? { driver: personNameSchema, plate: plateSchema, dphone: phoneSchema }
+        : { address: addressSchema }),
+      ...(f.doc ? { doc: docSchema(f.docType) } : {}),
+    });
+    const r = schema.safeParse(f);
+    const e: Record<string, string> = r.success ? {} : zodFieldErrors(r.error);
+    const dateErr = deliveryDateError(f.date);
+    if (dateErr) e.date = dateErr;
     if (service === "taxi_delivery" && (f.arrival < "04:00" || f.arrival > "09:00")) e.arrival = "Entre 04:00 y 09:00 am";
     if (service === "minivan_delivery" && !mv.ok) e.service = "El pedido supera 750 kg, supera el límite por pedido";
     setErr(e);
-    if (Object.keys(e).length) { toast.error("Completa los campos obligatorios"); return; }
+    if (Object.keys(e).length) { toast.error("Revisa los campos marcados"); return; }
     const o: Order = {
       code: "", createdAt: new Date().toISOString(), business: f.business, contact: f.contact, phone: f.phone, service, status: "received",
       items: sum.lines.map((l) => ({ productId: l.productId, name: l.product.name, vendorId: l.product.vendorId, qty: l.qty, unitPrice: l.product.price, unit: l.product.unit, weightKg: l.product.weightKg, note: l.note })),

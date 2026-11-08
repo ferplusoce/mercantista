@@ -5,8 +5,10 @@ import { toast } from "sonner";
 import { LogOut, Trash2 } from "lucide-react";
 import { ZONES } from "@/lib/data";
 import { emailToPhone, signOut, useAccount, useSession, type Profile } from "@/lib/account";
+import { z } from "zod";
 import { Card, Field, inputCls } from "@/components/Field";
 import { Welcome } from "@/components/Welcome";
+import { addressSchema, businessSchema, docSchema, formatPlate, onlyDigits, personNameSchema, phoneSchema, plateSchema, refSchema, zodFieldErrors } from "@/lib/validators";
 
 export const Route = createFileRoute("/cuenta")({
   head: () => ({ meta: [
@@ -28,8 +30,25 @@ function Cuenta() {
   const [p, setP] = useState<Profile | null>(null);
   const [taxi, setTaxi] = useState({ driver: "", plate: "", phone: "" });
   const [addr, setAddr] = useState({ zone: ZONES[0] as string, line: "", ref: "" });
+  const [err, setErr] = useState<Record<string, string>>({});
   useEffect(() => { if (acc.data) setP(acc.data.profile); }, [acc.data]);
   const fail = () => toast.error("No se pudo guardar");
+  const saveProfile = () => {
+    if (!p) return;
+    const r = z.object({ business_name: businessSchema, owner_name: personNameSchema, phone: phoneSchema, doc_number: docSchema(p.doc_type) }).safeParse(p);
+    if (!r.success) { setErr(zodFieldErrors(r.error)); toast.error("Revisa los campos marcados"); return; }
+    setErr({}); acc.saveProfile(p).then(() => toast.success("Datos guardados"), fail);
+  };
+  const saveAddress = () => {
+    const r = z.object({ line: addressSchema, ref: refSchema }).safeParse(addr);
+    if (!r.success) { setErr(zodFieldErrors(r.error)); toast.error("Revisa los campos marcados"); return; }
+    setErr({}); acc.addAddress(addr).then(() => setAddr({ ...addr, line: "", ref: "" }), fail);
+  };
+  const saveTaxi = () => {
+    const r = z.object({ driver: personNameSchema, plate: plateSchema, phone: z.union([z.literal(""), phoneSchema]) }).safeParse(taxi);
+    if (!r.success) { setErr(zodFieldErrors(r.error)); toast.error("Revisa los campos marcados"); return; }
+    setErr({}); acc.addTaxi(taxi).then(() => setTaxi({ driver: "", plate: "", phone: "" }), fail);
+  };
   if (loading) return <p className="p-10 text-center text-muted-foreground">Cargando...</p>;
   if (!user) return (
     <div className="space-y-5">
@@ -52,28 +71,31 @@ function Cuenta() {
       <p className="text-sm text-muted-foreground">Ingresaste con el celular {emailToPhone(user.email) || p?.phone}.</p>
       {!p ? <p className="text-muted-foreground">Cargando tus datos...</p> : (
       <Card className="grid gap-3 md:grid-cols-5">
-        <Field label="Bodega"><input className={inputCls} value={p.business_name} onChange={upd("business_name")} /></Field>
-        <Field label="Dueño"><input className={inputCls} value={p.owner_name} onChange={upd("owner_name")} /></Field>
-        <Field label="Teléfono"><input className={inputCls} inputMode="numeric" value={p.phone} onChange={upd("phone")} /></Field>
+        <Field label="Bodega" error={err.business_name}><input className={inputCls} value={p.business_name} onChange={upd("business_name")} /></Field>
+        <Field label="Dueño" error={err.owner_name}><input className={inputCls} value={p.owner_name} onChange={upd("owner_name")} /></Field>
+        <Field label="Teléfono" error={err.phone}><input className={inputCls} inputMode="numeric" maxLength={9} value={p.phone} onChange={(e) => p && setP({ ...p, phone: onlyDigits(e.target.value) })} /></Field>
         <Field label="Documento"><select className={inputCls} value={p.doc_type} onChange={upd("doc_type")}><option>DNI</option><option>RUC</option></select></Field>
-        <Field label="Número"><input className={inputCls} inputMode="numeric" value={p.doc_number} onChange={upd("doc_number")} /></Field>
-        <button className="h-11 rounded-xl bg-primary font-semibold text-primary-foreground md:col-span-5" onClick={() => acc.saveProfile(p).then(() => toast.success("Datos guardados"), fail)}>Guardar mis datos</button>
+        <Field label="Número" error={err.doc_number}><input className={inputCls} inputMode="numeric" maxLength={11} value={p.doc_number} onChange={(e) => p && setP({ ...p, doc_number: onlyDigits(e.target.value, 11) })} /></Field>
+        <button className="h-11 rounded-xl bg-primary font-semibold text-primary-foreground md:col-span-5" onClick={saveProfile}>Guardar mis datos</button>
       </Card>)}
       <div className="grid gap-5 md:grid-cols-2">
         <Card className="space-y-3">
           <h2 className="font-bold">Direcciones de entrega</h2>
           {d?.addresses.map((a) => <div key={a.id} className="flex justify-between rounded-xl bg-muted p-3 text-sm"><div><p className="font-semibold">{a.line}</p><p className="text-muted-foreground">{a.zone} · {a.ref}</p></div><button aria-label="Eliminar" onClick={() => acc.removeAddress(a.id).catch(fail)}><Trash2 className="h-4 w-4" /></button></div>)}
           <select className={inputCls} value={addr.zone} onChange={(e) => setAddr({ ...addr, zone: e.target.value })}>{ZONES.map((z) => <option key={z}>{z}</option>)}</select>
-          <input className={inputCls} placeholder="Dirección" value={addr.line} onChange={(e) => setAddr({ ...addr, line: e.target.value })} />
-          <input className={inputCls} placeholder="Referencia (portón, color, esquina)" value={addr.ref} onChange={(e) => setAddr({ ...addr, ref: e.target.value })} />
-          <button className="h-11 w-full rounded-xl border font-semibold" onClick={() => { if (!addr.line) { toast.error("Ingresa la dirección"); return; } acc.addAddress(addr).then(() => setAddr({ ...addr, line: "", ref: "" }), fail); }}>Guardar dirección</button>
+          <div><input className={inputCls} placeholder="Dirección (ej. Av. Los Álamos 123)" value={addr.line} onChange={(e) => setAddr({ ...addr, line: e.target.value })} />{err.line && <p className="mt-1 text-xs text-destructive">{err.line}</p>}</div>
+          <div><input className={inputCls} placeholder="Referencia (portón, color, esquina)" value={addr.ref} onChange={(e) => setAddr({ ...addr, ref: e.target.value })} />{err.ref && <p className="mt-1 text-xs text-destructive">{err.ref}</p>}</div>
+          <button className="h-11 w-full rounded-xl border font-semibold" onClick={saveAddress}>Guardar dirección</button>
         </Card>
         <Card className="space-y-3">
           <h2 className="font-bold">Mis taxis de confianza</h2>
           {d?.taxis.map((t) => <div key={t.id} className="flex justify-between rounded-xl bg-muted p-3 text-sm"><span>🚕 {t.driver} · {t.plate} · {t.phone}</span><button aria-label="Eliminar" onClick={() => acc.removeTaxi(t.id).catch(fail)}><Trash2 className="h-4 w-4" /></button></div>)}
-          <input className={inputCls} placeholder="Nombre del chofer" value={taxi.driver} onChange={(e) => setTaxi({ ...taxi, driver: e.target.value })} />
-          <div className="grid grid-cols-2 gap-2"><input className={inputCls} placeholder="Placa" value={taxi.plate} onChange={(e) => setTaxi({ ...taxi, plate: e.target.value.toUpperCase() })} /><input className={inputCls} placeholder="Celular" inputMode="numeric" value={taxi.phone} onChange={(e) => setTaxi({ ...taxi, phone: e.target.value })} /></div>
-          <button className="h-11 w-full rounded-xl border font-semibold" onClick={() => { if (!taxi.driver || !taxi.plate) { toast.error("Completa chofer y placa"); return; } acc.addTaxi(taxi).then(() => setTaxi({ driver: "", plate: "", phone: "" }), fail); }}>Guardar taxi</button>
+          <div><input className={inputCls} placeholder="Nombre del chofer" value={taxi.driver} onChange={(e) => setTaxi({ ...taxi, driver: e.target.value })} />{err.driver && <p className="mt-1 text-xs text-destructive">{err.driver}</p>}</div>
+          <div className="grid grid-cols-2 gap-2">
+            <div><input className={inputCls} placeholder="Placa ABC-123" maxLength={7} value={taxi.plate} onChange={(e) => setTaxi({ ...taxi, plate: formatPlate(e.target.value) })} />{err.plate && <p className="mt-1 text-xs text-destructive">{err.plate}</p>}</div>
+            <div><input className={inputCls} placeholder="Celular" inputMode="numeric" maxLength={9} value={taxi.phone} onChange={(e) => setTaxi({ ...taxi, phone: onlyDigits(e.target.value) })} />{err.phone && <p className="mt-1 text-xs text-destructive">{err.phone}</p>}</div>
+          </div>
+          <button className="h-11 w-full rounded-xl border font-semibold" onClick={saveTaxi}>Guardar taxi</button>
         </Card>
       </div>
       <Link to="/mis-pedidos" className="inline-flex h-12 w-full items-center justify-center rounded-xl border font-bold">Ver mis pedidos</Link>
