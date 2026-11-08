@@ -5,8 +5,10 @@ import { toast } from "sonner";
 import { LogOut, Trash2 } from "lucide-react";
 import { ZONES } from "@/lib/data";
 import { emailToPhone, signOut, useAccount, useSession, type Profile } from "@/lib/account";
+import { z } from "zod";
 import { Card, Field, inputCls } from "@/components/Field";
 import { Welcome } from "@/components/Welcome";
+import { addressSchema, businessSchema, docSchema, formatPlate, onlyDigits, personNameSchema, phoneSchema, plateSchema, refSchema, zodFieldErrors } from "@/lib/validators";
 
 export const Route = createFileRoute("/cuenta")({
   head: () => ({ meta: [
@@ -28,8 +30,25 @@ function Cuenta() {
   const [p, setP] = useState<Profile | null>(null);
   const [taxi, setTaxi] = useState({ driver: "", plate: "", phone: "" });
   const [addr, setAddr] = useState({ zone: ZONES[0] as string, line: "", ref: "" });
+  const [err, setErr] = useState<Record<string, string>>({});
   useEffect(() => { if (acc.data) setP(acc.data.profile); }, [acc.data]);
   const fail = () => toast.error("No se pudo guardar");
+  const saveProfile = () => {
+    if (!p) return;
+    const r = z.object({ business_name: businessSchema, owner_name: personNameSchema, phone: phoneSchema, doc_number: docSchema(p.doc_type) }).safeParse(p);
+    if (!r.success) { setErr(zodFieldErrors(r.error)); toast.error("Revisa los campos marcados"); return; }
+    setErr({}); acc.saveProfile(p).then(() => toast.success("Datos guardados"), fail);
+  };
+  const saveAddress = () => {
+    const r = z.object({ line: addressSchema, ref: refSchema }).safeParse(addr);
+    if (!r.success) { setErr(zodFieldErrors(r.error)); toast.error("Revisa los campos marcados"); return; }
+    setErr({}); acc.addAddress(addr).then(() => setAddr({ ...addr, line: "", ref: "" }), fail);
+  };
+  const saveTaxi = () => {
+    const r = z.object({ driver: personNameSchema, plate: plateSchema, phone: z.union([z.literal(""), phoneSchema]) }).safeParse(taxi);
+    if (!r.success) { setErr(zodFieldErrors(r.error)); toast.error("Revisa los campos marcados"); return; }
+    setErr({}); acc.addTaxi(taxi).then(() => setTaxi({ driver: "", plate: "", phone: "" }), fail);
+  };
   if (loading) return <p className="p-10 text-center text-muted-foreground">Cargando...</p>;
   if (!user) return (
     <div className="space-y-5">
